@@ -1,10 +1,11 @@
 #ifndef CACHE_STRUCT_HPP
 #define CACHE_STRUCT_HPP
 
-#include <stdio.h>
+#include <stdio.h> 
 #include <stdbool.h>
+#include <list>
 
-typedef size_t Tick_t ;
+typedef size_t Tick_t;
 
 struct CacheCell
 {
@@ -20,9 +21,18 @@ struct CacheCell
 struct LFU
 {
     size_t     cacheSize;
-    CacheCell* data;
+
+    std::list<CacheCell> data;
     Tick_t     tick;
+
+    inline size_t nextTick() { return ++tick; }
 };
+
+template <class T>
+void listDtor(std::list<T>& list) 
+{
+    list.clear(); 
+}
 
 void lfuCtor(LFU* cache, size_t cacheSize);
 void lfuDtor(LFU* cache);

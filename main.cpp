@@ -2,9 +2,13 @@
 #include <stdbool.h>
 #include <myLib.hpp>
 #include <stdint.h> 
-#include <vector.hpp>
+#include <cmath>
+#include <vector>
 #include "headers/cacheStruct.hpp"
 #include "headers/cacheFunc.hpp"
+#include "headers/cacheDump.hpp"
+
+static inline size_t getKey(int value) { return abs(static_cast<long>(value) + 1); }
 
 int main(int argc, const char* argv[])
 {
@@ -30,8 +34,7 @@ int main(int argc, const char* argv[])
     LFU cache = {};
     lfuCtor(&cache, cacheSize);
 
-    Vector vec = {};
-    vectorCtor(&vec);
+    std::vector<int> vec = {};
     
     if (interface)
         printf(BLUE"Please enter"GREEN" %zu "RESET BLUE"items:"RESET, nItems);
@@ -40,13 +43,16 @@ int main(int argc, const char* argv[])
     for (size_t i = 0; i < nItems; i++)
     {
         scanf("%d", &value);
-        vectorPush(&vec, (void*)(uintptr_t)value);
+        vec.push_back(value);
     }
 
+    for (size_t i = 0; i < nItems; ++i)
+    {
+        cachePut(&cache, getKey(vec[i]), vec[i]);
+    }
 
-    //vectorDump(vec);
+    consoleDump(cache);
 
-    vectorDtor(&vec);
     lfuDtor(&cache);
 
     return 0;

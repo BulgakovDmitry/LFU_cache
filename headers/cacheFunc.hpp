@@ -5,6 +5,6 @@
 
 const size_t KEY_NO_FOUND = 0;
 
-void cachePut(LFU* cache, size_t key, size_t value);
+void cachePut(LFU* cache, size_t key, int value);
 
 #endif

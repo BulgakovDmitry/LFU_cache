@@ -8,14 +8,13 @@ COMPILER = g++
 #--------------------------------------------------------------------------------------------------
 SRC  = src/
 HPP  = headers/
-VEC  = vector/
 LIB  = myLib/
 OBJ  = obj/
 #--------------------------------------------------------------------------------------------------
 
 
 #--------------------------------------------------------------------------------------------------
-INCLUDE_FLAGS = -I$(LIB) -I$(VEC) -I$(HPP) 
+INCLUDE_FLAGS = -I$(LIB) -I$(HPP) 
 SANITAZER     = -fsanitize=address
 SFML_FLAGS    = -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio 
 GDB           = -g
@@ -34,15 +33,14 @@ FLAGS		  = -D _DEBUG -ggdb3 -std=c++17 $(OPTIMIZ_OF) -Wall -Wextra -Weffc++ -Wag
 
 
 #--------------------------------------------------------------------------------------------------
-VECTOR_OBJ = $(OBJ)vector.o 
-LFU_OBJ    = $(OBJ)cacheStruct.o $(OBJ)cacheFunc.o
+LFU_OBJ    = $(OBJ)cacheStruct.o $(OBJ)cacheFunc.o $(OBJ)cacheDump.o
 MYLIB_OBJ  = $(OBJ)myLib.o
 #--------------------------------------------------------------------------------------------------
 
 
 #--------------------------------------------------------------------------------------------------
 lfu_: lfu
-	./lfu.out --interface
+	./lfu.out --interfac
 
 run: lfu
 
@@ -57,7 +55,7 @@ clean:
 
 
 #--------------------------------------------------------------------------------------------------
-lfu: $(LFU_OBJ) $(MYLIB_OBJ) $(VECTOR_OBJ) $(OBJ)main.o
+lfu: $(LFU_OBJ) $(MYLIB_OBJ) $(OBJ)main.o
 	$(COMPILER) $^ -o lfu.out $(FLAGS)
 #--------------------------------------------------------------------------------------------------
 
@@ -67,9 +65,6 @@ $(OBJ)%.o : $(LIB)%.cpp
 	$(COMPILER) $(FLAGS) -c $< -o $@
 
 $(OBJ)%.o : $(SRC)%.cpp
-	$(COMPILER) $(FLAGS) -c $< -o $@
-
-$(OBJ)%.o : $(VEC)%.cpp
 	$(COMPILER) $(FLAGS) -c $< -o $@	
 
 $(OBJ)%.o : %.cpp
