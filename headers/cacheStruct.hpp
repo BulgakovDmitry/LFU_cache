@@ -1,5 +1,5 @@
 #ifndef CACHE_STRUCT_HPP
-    #define CACHE_STRUCT_HPP
+#define CACHE_STRUCT_HPP
 
 #include <stdio.h>
 #include <stdbool.h>
@@ -19,11 +19,12 @@ struct CacheCell
 
 struct LFU
 {
+    size_t     cacheSize;
     CacheCell* data;
     Tick_t     tick;
 };
 
 void lfuCtor(LFU* cache, size_t cacheSize);
-void lfuDtor(LFU* cache, size_t cacheSize);
+void lfuDtor(LFU* cache);
 
 #endif
