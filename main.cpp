@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <myLib.hpp>
-#include <stdint.h> 
+#include <cstdint> 
 #include <cmath>
 #include <vector>
 #include "headers/cacheStruct.hpp"

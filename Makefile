@@ -6,15 +6,16 @@ COMPILER = g++
 
 
 #--------------------------------------------------------------------------------------------------
-SRC  = src/
-HPP  = headers/
-LIB  = myLib/
-OBJ  = obj/
+SRC   = src/
+HPP   = headers/
+LIB   = myLib/
+OBJ   = obj/
+TESTS = tests/
 #--------------------------------------------------------------------------------------------------
 
 
 #--------------------------------------------------------------------------------------------------
-INCLUDE_FLAGS = -I$(LIB) -I$(HPP) 
+INCLUDE_FLAGS = -I$(LIB) -I$(TESTS) -I$(HPP) 
 SANITAZER     = -fsanitize=address
 SFML_FLAGS    = -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio 
 GDB           = -g
@@ -35,12 +36,16 @@ FLAGS		  = -D _DEBUG -ggdb3 -std=c++17 $(OPTIMIZ_OF) -Wall -Wextra -Weffc++ -Wag
 #--------------------------------------------------------------------------------------------------
 LFU_OBJ    = $(OBJ)cacheStruct.o $(OBJ)cacheFunc.o $(OBJ)cacheDump.o
 MYLIB_OBJ  = $(OBJ)myLib.o
+TEST_OBJ   = $(OBJ)tests.o
 #--------------------------------------------------------------------------------------------------
 
 
 #--------------------------------------------------------------------------------------------------
 lfu_: lfu
-	./lfu.out --interfac
+	./lfu.out --interface
+
+test_: test
+	./tests.out
 
 run: lfu
 
@@ -57,6 +62,9 @@ clean:
 #--------------------------------------------------------------------------------------------------
 lfu: $(LFU_OBJ) $(MYLIB_OBJ) $(OBJ)main.o
 	$(COMPILER) $^ -o lfu.out $(FLAGS)
+
+test: $(TEST_OBJ) $(MYLIB_OBJ) $(OBJ)testsMain.o
+	$(COMPILER) $^ -o tests.out $(FLAGS)
 #--------------------------------------------------------------------------------------------------
 
 
@@ -68,5 +76,8 @@ $(OBJ)%.o : $(SRC)%.cpp
 	$(COMPILER) $(FLAGS) -c $< -o $@	
 
 $(OBJ)%.o : %.cpp
+	$(COMPILER) $(FLAGS) -c $< -o $@
+
+$(OBJ)%.o : $(TESTS)%.cpp
 	$(COMPILER) $(FLAGS) -c $< -o $@
 #--------------------------------------------------------------------------------------------------
