@@ -1,8 +1,7 @@
 #include "myLib.hpp"
 #include "math.h"
 
-size_t getFileSize(FILE* file)
-{
+size_t getFileSize(FILE* file) {
     ASSERT(file, "file = NULL, it is impossible to work with null ptr", stderr);
 
     long currentPos = ftell(file);
@@ -13,8 +12,7 @@ size_t getFileSize(FILE* file)
     return size;
 }
 
-char* readFileToBuffer(FILE* file)
-{
+char* readFileToBuffer(FILE* file) {
     ASSERT(file, "file = NULL, it is impossible to work with null ptr", stderr);
 
     size_t size_file = getFileSize((file));
@@ -25,8 +23,7 @@ char* readFileToBuffer(FILE* file)
     rewind(file);
 
     size_t read = fread(buffer, sizeof(char), size_file, file);
-    if (read != (size_file))      
-    {
+    if (read != (size_file)) {
         free(buffer);
         return nullptr;
     }
@@ -36,7 +33,6 @@ char* readFileToBuffer(FILE* file)
     return buffer;
 }
 
-bool doubleCmp(double a, double b) 
-{
+bool doubleCmp(double a, double b) {
     return (fabs(a - b) < DOUBLE_EPSILON);
 }

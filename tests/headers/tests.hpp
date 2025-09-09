@@ -6,7 +6,7 @@
 #include <array>
 
 struct Test {
-    size_t cacheSize, nItems;
+    std::size_t      cacheSize, nItems;
     std::vector<int> inputVec;
     std::vector<int> outputVec;
 };
@@ -25,7 +25,7 @@ enum class TestResult {
     TEST_FAILURE = 1
 };
 
-inline constexpr size_t NUMBER_OF_TESTS = 12;
+inline constexpr std::size_t NUMBER_OF_TESTS = 12;
 
 void testsRun(const std::array<Test, NUMBER_OF_TESTS>& dataBase);
 

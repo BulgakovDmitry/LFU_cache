@@ -1,12 +1,12 @@
 #include "../headers/tests.hpp"
 #include <myLib.hpp>
 #include <array>
-#include "../headers/cacheStruct.hpp"
+#include "../headers/cache.hpp"
 #include "../headers/cacheFunc.hpp"
 
 static TestResult testVerify       (uint64_t testStatus);
 static void       printErrorLog    (uint64_t testStatus);
-static void       printAlgorithmLog(LFU cache, Test test);
+static void       printAlgorithmLog(LFU& cache, Test test);
 
 static TestResult test             (const Test& test, uint64_t& testStatus);
 static TestResult inputTest        (const Test& test, uint64_t& testStatus);
@@ -32,13 +32,13 @@ static void printErrorLog(uint64_t testStatus) {
 }
 #undef IS_ERROR
 
-static void printAlgorithmLog(LFU cache, Test test) {
+static void printAlgorithmLog(LFU& cache, Test test) {
     std::cout << RED << "\t\t\t\texpected [ " << RESET;
-    for (size_t k = 0; k < test.cacheSize; ++k)
+    for (std::size_t k = 0; k < test.cacheSize; ++k)
         std::cout << YELLOW << test.outputVec[k] << ' ' << RESET;
     std::cout << RED << ']' << RESET;
     std::cout << RED << ", but got [ " << RESET;
-    for (auto it = cache.data.begin(); it != cache.data.end(); ++it)
+    for (auto it = cache.begin(); it != cache.end(); ++it)
         std::cout << YELLOW << it->value << ' ' << RESET;
     std::cout << RED << "]\n" << RESET;
 }
@@ -82,14 +82,13 @@ static TestResult inputTest(const Test& test, uint64_t& testStatus) {
 static TestResult algorithmicTest(const Test& test, uint64_t& testStatus) {
     std::cout << MANG << "\talgor test\t" << RESET;
 
-    LFU cache = {};
-    lfuCtor(cache, test.cacheSize);
+    LFU cache(test.cacheSize);
 
-    for (size_t i = 0; i < test.nItems; ++i)
-        cachePut(&cache, getKey(test.inputVec[i]), test.inputVec[i]);
+    for (std::size_t i = 0; i < test.nItems; ++i)
+        cachePut(cache, getKey(test.inputVec[i]), test.inputVec[i]);
 
-    size_t i = 0;
-    for (auto it = cache.data.begin(); it != cache.data.end(); ++it) {
+    std::size_t i = 0;
+    for (auto it = cache.begin(); it != cache.end(); ++it) {
         if (it->value != test.outputVec[i])
             testStatus |= static_cast<uint64_t>(TestError::ALGORITHM_ERROR);
         ++i;
@@ -99,7 +98,6 @@ static TestResult algorithmicTest(const Test& test, uint64_t& testStatus) {
     if (testStatus != static_cast<uint64_t>(TestError::OK))
         printAlgorithmLog(cache, test);
 
-    lfuDtor(cache);
     testStatus = 0;
     return testResult;
 }
@@ -126,7 +124,7 @@ void testsRun(const std::array<Test, NUMBER_OF_TESTS>& dataBase)
     uint64_t testStatus   = 0;
     uint64_t resultStatus = 0;
 
-    for (size_t i = 0; i < NUMBER_OF_TESTS; ++i) {
+    for (std::size_t i = 0; i < NUMBER_OF_TESTS; ++i) {
         std::cout << BLUE << "test (" << GREEN << i + 1 << BLUE << ')' << RED << ":\n" << RESET;
         resultStatus += static_cast<uint64_t>(test(dataBase[i], testStatus));
     }
