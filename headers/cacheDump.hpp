@@ -9,5 +9,4 @@
 void consoleDump    (const LFU& cache);
 void consoleFullDump(const LFU& cache);
 
-
 #endif

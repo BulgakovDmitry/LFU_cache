@@ -15,7 +15,7 @@ TESTS = tests/
 
 
 #--------------------------------------------------------------------------------------------------
-INCLUDE_FLAGS = -I$(LIB) -I$(TESTS) -I$(HPP) 
+INCLUDE_FLAGS = -I$(LIB) -I$(HPP) 
 SANITAZER     = -fsanitize=address
 SFML_FLAGS    = -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio 
 GDB           = -g
@@ -36,33 +36,40 @@ FLAGS		  = -D _DEBUG -ggdb3 -std=c++17 $(OPTIMIZ_OF) -Wall -Wextra -Weffc++ -Wag
 #--------------------------------------------------------------------------------------------------
 LFU_OBJ    = $(OBJ)cacheStruct.o $(OBJ)cacheFunc.o $(OBJ)cacheDump.o
 MYLIB_OBJ  = $(OBJ)myLib.o
-TEST_OBJ   = $(OBJ)tests.o
+TEST_OBJ   = $(OBJ)tests.o $(LFU_OBJ) $(MYLIB_OBJ)
 #--------------------------------------------------------------------------------------------------
 
 
 #--------------------------------------------------------------------------------------------------
+.PHONY: lfu_
 lfu_: lfu
 	./lfu.out --interface
 
+.PHONY: test_
 test_: test
 	./tests.out
 
+.PHONY: run
 run: lfu
 
+.PHONY: run_
 run_: lfu_
 #--------------------------------------------------------------------------------------------------
      
 
 #--------------------------------------------------------------------------------------------------
+.PHONY: clean
 clean: 
 	rm -f $(OBJ)*
 #--------------------------------------------------------------------------------------------------
 
 
 #--------------------------------------------------------------------------------------------------
+.PHONY: lfu 
 lfu: $(LFU_OBJ) $(MYLIB_OBJ) $(OBJ)main.o
 	$(COMPILER) $^ -o lfu.out $(FLAGS)
 
+.PHONY: test
 test: $(TEST_OBJ) $(MYLIB_OBJ) $(OBJ)testsMain.o
 	$(COMPILER) $^ -o tests.out $(FLAGS)
 #--------------------------------------------------------------------------------------------------
@@ -78,6 +85,6 @@ $(OBJ)%.o : $(SRC)%.cpp
 $(OBJ)%.o : %.cpp
 	$(COMPILER) $(FLAGS) -c $< -o $@
 
-$(OBJ)%.o : $(TESTS)%.cpp
+$(OBJ)%.o : $(TESTS)$(SRC)%.cpp
 	$(COMPILER) $(FLAGS) -c $< -o $@
 #--------------------------------------------------------------------------------------------------

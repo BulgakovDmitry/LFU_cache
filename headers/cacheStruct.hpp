@@ -7,8 +7,7 @@
 
 typedef size_t Tick_t;
 
-struct CacheCell
-{
+struct CacheCell {
     size_t key;
     int    value;
 
@@ -18,8 +17,7 @@ struct CacheCell
     bool   emptyFlag;
 };
 
-struct LFU
-{
+struct LFU {
     size_t     cacheSize;
 
     std::list<CacheCell> data;
@@ -29,12 +27,9 @@ struct LFU
 };
 
 template <class T>
-void listDtor(std::list<T>& list) 
-{
-    list.clear(); 
-}
+inline void listDtor(std::list<T>& list) { list.clear(); }
 
-void lfuCtor(LFU* cache, size_t cacheSize);
-void lfuDtor(LFU* cache);
+void lfuCtor(LFU& cache, size_t cacheSize);
+void lfuDtor(LFU& cache);
 
 #endif

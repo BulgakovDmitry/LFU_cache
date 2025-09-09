@@ -1,0 +1,141 @@
+#include "../headers/tests.hpp"
+#include <myLib.hpp>
+#include <array>
+#include "../headers/cacheStruct.hpp"
+#include "../headers/cacheFunc.hpp"
+
+static TestResult testVerify       (uint64_t testStatus);
+static void       printErrorLog    (uint64_t testStatus);
+static void       printAlgorithmLog(LFU cache, Test test);
+
+static TestResult test             (const Test& test, uint64_t& testStatus);
+static TestResult inputTest        (const Test& test, uint64_t& testStatus);
+static TestResult algorithmicTest  (const Test& test, uint64_t& testStatus);
+
+#define IS_ERROR(error) (testStatus & static_cast<uint64_t>(error))
+static void printErrorLog(uint64_t testStatus) {
+    if (IS_ERROR(TestError::NIL_CACHE_SIZE)) 
+        std::cout << RED << "\t\t\t\tERROR CODE " << static_cast<uint64_t>(TestError::NIL_CACHE_SIZE) 
+                  << " - cache size = 0, it is empty cache\n" << RESET;
+    if (IS_ERROR(TestError::INPUT_VECTOR_OVERFLOW))
+        std::cout << RED << "\t\t\t\tERROR CODE " << static_cast<uint64_t>(TestError::INPUT_VECTOR_OVERFLOW)
+                  << " - too many input values\n" << RESET;
+    if (IS_ERROR(TestError::INPUT_VECTOR_UNFILLED))
+        std::cout << RED << "\t\t\t\tERROR CODE " << static_cast<uint64_t>(TestError::INPUT_VECTOR_UNFILLED)
+                  << " - you have not entered all the values\n" << RESET;
+    if (IS_ERROR(TestError::INVALID_OUTPUT_VECTOR))
+        std::cout << RED << "\t\t\t\tERROR CODE " << static_cast<uint64_t>(TestError::INVALID_OUTPUT_VECTOR)
+                  << " - incorrect output format\n" << RESET;
+    if (IS_ERROR(TestError::ALGORITHM_ERROR))
+        std::cout << RED << "\t\t\t\tERROR CODE " << static_cast<uint64_t>(TestError::ALGORITHM_ERROR)
+                  << " - the algorithm produced an incorrect result\n" << RESET;
+}
+#undef IS_ERROR
+
+static void printAlgorithmLog(LFU cache, Test test) {
+    std::cout << RED << "\t\t\t\texpected [ " << RESET;
+    for (size_t k = 0; k < test.cacheSize; ++k)
+        std::cout << YELLOW << test.outputVec[k] << ' ' << RESET;
+    std::cout << RED << ']' << RESET;
+    std::cout << RED << ", but got [ " << RESET;
+    for (auto it = cache.data.begin(); it != cache.data.end(); ++it)
+        std::cout << YELLOW << it->value << ' ' << RESET;
+    std::cout << RED << "]\n" << RESET;
+}
+
+static TestResult testVerify(uint64_t testStatus) {
+    std::cout << CEAN << "verification... " << RESET;
+    if (testStatus == static_cast<uint64_t>(TestError::OK)) {
+        std::cout << GREEN << "SUCCESS\n" << RESET;
+        return TestResult::TEST_SUCCESS;
+    }
+    else {
+        std::cout << RED << "FAILURE\n" << RESET;
+        printErrorLog(testStatus);
+        return TestResult::TEST_FAILURE;
+    }
+}
+
+static TestResult inputTest(const Test& test, uint64_t& testStatus) {
+    std::cout << MANG << "\tinput test\t" << RESET;
+
+    if (test.cacheSize == 0)
+        testStatus |= static_cast<uint64_t>(TestError::NIL_CACHE_SIZE);
+    
+    if (test.inputVec.size() != test.nItems) {
+        if (test.inputVec.size() > test.nItems)
+            testStatus |= static_cast<uint64_t>(TestError::INPUT_VECTOR_OVERFLOW);
+        else 
+            testStatus |= static_cast<uint64_t>(TestError::INPUT_VECTOR_UNFILLED);
+    }
+
+    if (test.outputVec.size() != test.cacheSize) {
+        if (test.inputVec.size() >= test.cacheSize)
+            testStatus |= static_cast<uint64_t>(TestError::INVALID_OUTPUT_VECTOR);
+    }
+
+    TestResult testResult = testVerify(testStatus);
+    testStatus = 0;
+    return testResult;
+}
+
+static TestResult algorithmicTest(const Test& test, uint64_t& testStatus) {
+    std::cout << MANG << "\talgor test\t" << RESET;
+
+    LFU cache = {};
+    lfuCtor(cache, test.cacheSize);
+
+    for (size_t i = 0; i < test.nItems; ++i)
+        cachePut(&cache, getKey(test.inputVec[i]), test.inputVec[i]);
+
+    size_t i = 0;
+    for (auto it = cache.data.begin(); it != cache.data.end(); ++it) {
+        if (it->value != test.outputVec[i])
+            testStatus |= static_cast<uint64_t>(TestError::ALGORITHM_ERROR);
+        ++i;
+    }
+
+    TestResult testResult = testVerify(testStatus);
+    if (testStatus != static_cast<uint64_t>(TestError::OK))
+        printAlgorithmLog(cache, test);
+
+    lfuDtor(cache);
+    testStatus = 0;
+    return testResult;
+}
+
+static TestResult test(const Test& test, uint64_t& testStatus) {
+    TestResult resultStatus = inputTest(test, testStatus);
+    if (resultStatus == TestResult::TEST_SUCCESS) {
+        resultStatus = algorithmicTest(test, testStatus);
+        if (resultStatus == TestResult::TEST_SUCCESS)
+            std::cout << GREEN << "<Test successfully completed>\n" << RESET;
+        else
+            std::cout << RED << "<failed test>\n" << RESET;
+    } 
+    else
+        std::cout << RED << "<failed test>\n" << RESET;
+    std::cout << std::endl;
+    return resultStatus;
+}
+
+void testsRun(const std::array<Test, NUMBER_OF_TESTS>& dataBase)
+{
+    std::cout << CEAN << "___________________________TESTING___________________________\n" <<  RESET;
+
+    uint64_t testStatus   = 0;
+    uint64_t resultStatus = 0;
+
+    for (size_t i = 0; i < NUMBER_OF_TESTS; ++i) {
+        std::cout << BLUE << "test (" << GREEN << i + 1 << BLUE << ')' << RED << ":\n" << RESET;
+        resultStatus += static_cast<uint64_t>(test(dataBase[i], testStatus));
+    }
+
+    std::cout << CEAN << "TESTS RESULT: " << RESET;
+    if (resultStatus) {
+        std::cout << RED << "FAILURE \t[ " << YELLOW << resultStatus 
+                  << RED << " test (tests) ended with an error ]" << RESET << std::endl;
+    }
+    else 
+        std::cout << GREEN << "SUCCESS" << RESET << std::endl;
+}
