@@ -1,5 +1,6 @@
 #include "../headers/cacheFunc.hpp"
-#include <myLib.hpp>
+#include <list>
+#include "cache.hpp"
 
 static inline std::list<CacheCell>::iterator findKeyIter         (LFU& cache, std::size_t key); 
 static inline std::list<CacheCell>::iterator findReplacedCellIter(LFU& cache);

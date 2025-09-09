@@ -1,6 +1,12 @@
 #include "../headers/cacheDump.hpp"
-#include "../headers/cacheFunc.hpp"
-#include <cassert>
+#include <stdio.h>                   
+#include <cstdlib>                  
+#include <fstream>                   
+#include <iostream>                  
+#include <list>                      
+#include "../headers/cacheFunc.hpp"  
+#include "cache.hpp"                 
+#include "myLib.hpp"                 
 
 static void dumpListNodes   (std::ofstream& gv, const std::vector<int>& vec, std::size_t cacheSize);
 static void dumpConnectNodes(std::ofstream& gv, std::size_t vecSize); 

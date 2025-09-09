@@ -1,12 +1,11 @@
 #ifndef CACHE_DUMP_HPP
 #define CACHE_DUMP_HPP
 
-#include <myLib.hpp>
-#include "cache.hpp"
-#include <iostream>
-#include <vector>
-#include <string>
-#include <fstream>
+#include <cstddef>  
+#include <string>   
+#include <vector>  
+
+class LFU;
 
 void consoleDump           (const LFU& cache);
 void consoleGeneralizedDump(const LFU& cache);

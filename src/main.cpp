@@ -1,10 +1,11 @@
-#include <stdbool.h>
-#include <myLib.hpp>
-#include <cstdint> 
-#include <vector>
-#include "../headers/cache.hpp"
-#include "../headers/cacheFunc.hpp"
-#include "../headers/cacheDump.hpp"
+#include <stdlib.h>                  // for EXIT_FAILURE
+#include <cstring>                   // for size_t, strlen, strncmp
+#include <iostream>                  // for operator<<, basic_ostream, char_...
+#include <myLib.hpp>                 // for BLUE, RESET, GREEN, YELLOW
+#include <vector>                    // for vector
+#include "../headers/cache.hpp"      // for LFU
+#include "../headers/cacheDump.hpp"  // for consoleDump, graphDump
+#include "../headers/cacheFunc.hpp"  // for cachePut, getKey
 
 int main(int argc, const char* argv[]) {
     if (!argc) return EXIT_FAILURE;

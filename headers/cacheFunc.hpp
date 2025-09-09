@@ -1,8 +1,9 @@
 #ifndef CACHE_FUNC_HPP
 #define CACHE_FUNC_HPP
 
-#include "cache.hpp"
-#include <cmath>
+#include <cstdlib>  
+
+class LFU;
 
 const std::size_t KEY_NO_FOUND = 0;
 

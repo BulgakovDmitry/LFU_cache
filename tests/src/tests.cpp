@@ -1,8 +1,10 @@
 #include "../headers/tests.hpp"
-#include <myLib.hpp>
-#include <array>
-#include "../headers/cache.hpp"
-#include "../headers/cacheFunc.hpp"
+#include <stdint.h>                  
+#include <iostream>                 
+#include <list>                      
+#include <myLib.hpp>                
+#include "../headers/cache.hpp"      
+#include "../headers/cacheFunc.hpp"  
 
 static TestResult testVerify       (uint64_t testStatus);
 static void       printErrorLog    (uint64_t testStatus);
@@ -135,7 +137,7 @@ static TestResult test(const Test& test, uint64_t& testStatus) {
     return resultStatus;
 }
 
-void testsRun(const std::array<Test, NUMBER_OF_TESTS>& dataBase)
+void testsRun(const std::vector<Test>& dataBase, std::size_t NUMBER_OF_TESTS)
 {
     std::cout << CEAN << "___________________________TESTING___________________________\n" <<  RESET;
 

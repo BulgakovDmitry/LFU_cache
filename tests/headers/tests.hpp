@@ -1,9 +1,8 @@
 #ifndef LFU_TESTS_HPP
 #define LFU_TESTS_HPP
 
-#include <iostream>
+#include <cstddef>  
 #include <vector>
-#include <array>
 
 struct Test {
     std::size_t      cacheSize, nItems, numberOfHits;
@@ -26,8 +25,6 @@ enum class TestResult {
     TEST_FAILURE = 1
 };
 
-inline constexpr std::size_t NUMBER_OF_TESTS = 18;
-
-void testsRun(const std::array<Test, NUMBER_OF_TESTS>& dataBase);
+void testsRun(const std::vector<Test>& dataBase, std::size_t NUMBER_OF_TESTS);
 
 #endif

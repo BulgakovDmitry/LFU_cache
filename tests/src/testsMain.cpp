@@ -1,9 +1,7 @@
 #include "../headers/tests.hpp"
-#include <myLib.hpp>
-#include <array>
-#include <iostream>
+#include <vector>
 
-static const std::array<Test, NUMBER_OF_TESTS> dataBase = {{
+static const std::vector<Test> dataBase = {{
     {3, 5,  3, {1, 2, 3, 4, 5},                             {5, 4, 3}          },
     {3, 8,  6, {1, 2, 3, 1, 2, 1, 4, 5},                    {5, 1, 2}          },
     {2, 3,  2, {1, 2, 3},                                   {3, 2}             },
@@ -17,7 +15,7 @@ static const std::array<Test, NUMBER_OF_TESTS> dataBase = {{
     {3, 6,  5, {1, 2, 1, 2, 3, 4},                          {4, 2, 1}          },
     {3, 6,  5, {1, 2, 3, 1, 2, 4},                          {4, 2, 1}          },
     {3, 7,  6, {1, 2, 1, 2, 1, 3, 4},                       {4, 1, 2}          },
-    {2, 5,  4, {1, 2, 1, 3, 3},                             {/*3*/2, 1}             },
+    {2, 5,  4, {1, 2, 1, 3, 3},                             {3, 1}             },
     {4, 8,  6, {1, 2, 3, 4, 2, 5, 2, 6},                    {6, 2, 5, 4}       },
     {3, 7,  5, {1, 2, 3, 2, 2, 4, 5},                       {5, 4, 2}          },
     {6, 5,  5, {11, 1, 1, 1, 9},                            {9, 1, 11, 1, 1, 1}}, 
@@ -26,5 +24,5 @@ static const std::array<Test, NUMBER_OF_TESTS> dataBase = {{
 
 
 int main() {
-    testsRun(dataBase); 
+    testsRun(dataBase, dataBase.size()); 
 }
