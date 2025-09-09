@@ -34,14 +34,17 @@ void cachePut(LFU& cache, std::size_t key, int value) {
         ++(it->numberOfRequests);
         it->lastAccessedTime = cache.nextTick();
         it->emptyFlag = false;
+        cache.cacheHit();
         cache.splice(cache.begin(), cache, it);
         return;
     }
 
     auto replacedCellIter = findReplacedCellIter(cache);
 
-    if (replacedCellIter == cache.end()) 
+    if (replacedCellIter == cache.end()) {   
         cache.push_front(CacheCell{key, value, 1, cache.nextTick(), false});
+        cache.cacheHit();
+    }
     else {
         replacedCellIter->key              = key;
         replacedCellIter->value            = value;

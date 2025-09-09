@@ -6,7 +6,8 @@
 
 static TestResult testVerify       (uint64_t testStatus);
 static void       printErrorLog    (uint64_t testStatus);
-static void       printAlgorithmLog(LFU& cache, Test test);
+static void       printAlgorithmLog(const LFU& cache, Test test);
+static void       printOutputLog   (const LFU& cache, Test test);
 
 static TestResult test             (const Test& test, uint64_t& testStatus);
 static TestResult inputTest        (const Test& test, uint64_t& testStatus);
@@ -16,31 +17,41 @@ static TestResult algorithmicTest  (const Test& test, uint64_t& testStatus);
 static void printErrorLog(uint64_t testStatus) {
     if (IS_ERROR(TestError::NIL_CACHE_SIZE)) 
         std::cout << RED << "\t\t\t\tERROR CODE " << static_cast<uint64_t>(TestError::NIL_CACHE_SIZE) 
-                  << " - cache size = 0, it is empty cache\n"          << RESET;
+                  << " - cache size = 0, it is empty cache\n"                << RESET;
     if (IS_ERROR(TestError::INPUT_VECTOR_OVERFLOW))
         std::cout << RED << "\t\t\t\tERROR CODE " << static_cast<uint64_t>(TestError::INPUT_VECTOR_OVERFLOW)
-                  << " - too many input values\n"                      << RESET;
+                  << " - too many input values\n"                            << RESET;
     if (IS_ERROR(TestError::INPUT_VECTOR_UNFILLED))
         std::cout << RED << "\t\t\t\tERROR CODE " << static_cast<uint64_t>(TestError::INPUT_VECTOR_UNFILLED)
-                  << " - you have not entered all the values\n"        << RESET;
+                  << " - you have not entered all the values\n"              << RESET;
     if (IS_ERROR(TestError::INVALID_OUTPUT_VECTOR))
         std::cout << RED << "\t\t\t\tERROR CODE " << static_cast<uint64_t>(TestError::INVALID_OUTPUT_VECTOR)
-                  << " - incorrect output format\n"                    << RESET;
-    if (IS_ERROR(TestError::ALGORITHM_ERROR))
+                  << " - incorrect output format\n"                          << RESET;
+    if (IS_ERROR(TestError::ALGORITHM_ERROR)) 
         std::cout << RED << "\t\t\t\tERROR CODE " << static_cast<uint64_t>(TestError::ALGORITHM_ERROR)
-                  << " - the algorithm produced an incorrect result\n" << RESET;
+                  << " - the algorithm produced an incorrect result\n"       << RESET;
+    if (IS_ERROR(TestError::INCORRECT_NUMBER_OF_HITS))
+        std::cout << RED << "\t\t\t\tERROR CODE " << static_cast<uint64_t>(TestError::INCORRECT_NUMBER_OF_HITS)
+                  << " - the program returned an incorrect number of hits\n" << RESET;
 }
 #undef IS_ERROR
 
-static void printAlgorithmLog(LFU& cache, Test test) {
+static void printAlgorithmLog(const LFU& cache, Test test) {
     std::cout << RED << "\t\t\t\texpected [ " << RESET;
     for (std::size_t k = 0; k < test.cacheSize; ++k)
         std::cout << YELLOW << test.outputVec[k] << ' ' << RESET;
     std::cout << RED << ']' << RESET;
-    std::cout << RED << ", but got [ " << RESET;
+    std::cout << RED << ", and got [ " << RESET;
     for (auto it = cache.begin(); it != cache.end(); ++it)
         std::cout << YELLOW << it->value << ' ' << RESET;
     std::cout << RED << "]\n" << RESET;
+}
+
+static void printOutputLog(const LFU& cache, Test test) {
+    std::cout << RED    << "\t\t\t\texpected number of hits " 
+              << YELLOW << test.numberOfHits
+              << RED    << " and got " 
+              << YELLOW << cache.getNumberOfHits() << std::endl << RESET;
 }
 
 static TestResult testVerify(uint64_t testStatus) {
@@ -94,9 +105,16 @@ static TestResult algorithmicTest(const Test& test, uint64_t& testStatus) {
         ++i;
     }
 
+    if (cache.getNumberOfHits() != test.numberOfHits)
+        testStatus |= static_cast<uint64_t>(TestError::INCORRECT_NUMBER_OF_HITS);
+
     TestResult testResult = testVerify(testStatus);
-    if (testStatus != static_cast<uint64_t>(TestError::OK))
-        printAlgorithmLog(cache, test);
+    if (testStatus != static_cast<uint64_t>(TestError::OK)) {
+        if (testStatus & static_cast<uint64_t>(TestError::ALGORITHM_ERROR))
+            printAlgorithmLog(cache, test);
+        if (testStatus & static_cast<uint64_t>(TestError::INCORRECT_NUMBER_OF_HITS))
+            printOutputLog(cache, test);
+    }
 
     testStatus = 0;
     return testResult;

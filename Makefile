@@ -45,7 +45,12 @@ all: lfu
 
 .PHONY: run
 run: lfu
-	./$(BIN)lfu.out --interface
+	./$(BIN)lfu.out 
+
+.PHONY: run_
+run_: lfu
+	./$(BIN)lfu.out  --interface
+
 
 .PHONY: tests
 test: tests
@@ -67,7 +72,8 @@ help:
 	printf '%s\n'                                                 \
 	"Main goals:" 									              \
 	"  make         - compile all"                                \
-	"  make run     - compile and run {lfu.out} with --interface" \
+	"  make run_    - compile and run {lfu.out} with --interface" \
+	"  make run     - compile and run {lfu.out}"                  \
 	"  make testRun - compile and run tests {tests.out}"          \
 	"  make lfu     - compile LFU algorithm"                      \
 	"  make test    - compile tests"                              \

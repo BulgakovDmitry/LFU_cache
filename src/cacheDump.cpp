@@ -3,7 +3,7 @@
 #include <cassert>
 
 static void dumpListNodes   (std::ofstream& gv, const std::vector<int>& vec, std::size_t cacheSize);
-static void dumpConnectNodes(std::ofstream& gv, std::size_t vecSize);
+static void dumpConnectNodes(std::ofstream& gv, std::size_t vecSize); 
 
 void consoleDump(const LFU& cache) {
     std::cout << MANG << "Console dump" << RED << ": " << RESET;

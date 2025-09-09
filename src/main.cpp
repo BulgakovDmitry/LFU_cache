@@ -37,6 +37,12 @@ int main(int argc, const char* argv[]) {
     for (std::size_t i = 0; i < nItems; ++i)
         cachePut(cache, getKey(vec[i]), vec[i]);
 
-    consoleDump(cache);
-    graphDump(vec, cacheSize);
+    if (interface) {
+        consoleDump(cache);
+        graphDump(vec, cacheSize);
+        std::cout << BLUE << "out: " << YELLOW << cache.getNumberOfHits() << std::endl << RESET; 
+    }
+    else
+        std::cout << cache.getNumberOfHits() << std::endl; 
+
 }

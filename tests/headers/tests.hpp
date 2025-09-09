@@ -6,18 +6,19 @@
 #include <array>
 
 struct Test {
-    std::size_t      cacheSize, nItems;
+    std::size_t      cacheSize, nItems, numberOfHits;
     std::vector<int> inputVec;
     std::vector<int> outputVec;
 };
 
 enum class TestError {
-    OK                    = 0,
-    NIL_CACHE_SIZE        = 1 << 0,
-    INPUT_VECTOR_OVERFLOW = 1 << 1,
-    INPUT_VECTOR_UNFILLED = 1 << 2,
-    INVALID_OUTPUT_VECTOR = 1 << 3,
-    ALGORITHM_ERROR       = 1 << 4
+    OK                       = 0,
+    NIL_CACHE_SIZE           = 1 << 0,
+    INPUT_VECTOR_OVERFLOW    = 1 << 1,
+    INPUT_VECTOR_UNFILLED    = 1 << 2,
+    INVALID_OUTPUT_VECTOR    = 1 << 3,
+    ALGORITHM_ERROR          = 1 << 4,
+    INCORRECT_NUMBER_OF_HITS = 1 << 5
 };
 
 enum class TestResult {
@@ -25,7 +26,7 @@ enum class TestResult {
     TEST_FAILURE = 1
 };
 
-inline constexpr std::size_t NUMBER_OF_TESTS = 12;
+inline constexpr std::size_t NUMBER_OF_TESTS = 18;
 
 void testsRun(const std::array<Test, NUMBER_OF_TESTS>& dataBase);
 
