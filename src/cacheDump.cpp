@@ -1,5 +1,6 @@
 #include "../headers/cacheDump.hpp"
 #include "../headers/cacheFunc.hpp"
+#include <cassert>
 
 static void dumpListNodes   (std::ofstream& gv, const std::vector<int>& vec, std::size_t cacheSize);
 static void dumpConnectNodes(std::ofstream& gv, std::size_t vecSize);

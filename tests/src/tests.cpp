@@ -16,16 +16,16 @@ static TestResult algorithmicTest  (const Test& test, uint64_t& testStatus);
 static void printErrorLog(uint64_t testStatus) {
     if (IS_ERROR(TestError::NIL_CACHE_SIZE)) 
         std::cout << RED << "\t\t\t\tERROR CODE " << static_cast<uint64_t>(TestError::NIL_CACHE_SIZE) 
-                  << " - cache size = 0, it is empty cache\n" << RESET;
+                  << " - cache size = 0, it is empty cache\n"          << RESET;
     if (IS_ERROR(TestError::INPUT_VECTOR_OVERFLOW))
         std::cout << RED << "\t\t\t\tERROR CODE " << static_cast<uint64_t>(TestError::INPUT_VECTOR_OVERFLOW)
-                  << " - too many input values\n" << RESET;
+                  << " - too many input values\n"                      << RESET;
     if (IS_ERROR(TestError::INPUT_VECTOR_UNFILLED))
         std::cout << RED << "\t\t\t\tERROR CODE " << static_cast<uint64_t>(TestError::INPUT_VECTOR_UNFILLED)
-                  << " - you have not entered all the values\n" << RESET;
+                  << " - you have not entered all the values\n"        << RESET;
     if (IS_ERROR(TestError::INVALID_OUTPUT_VECTOR))
         std::cout << RED << "\t\t\t\tERROR CODE " << static_cast<uint64_t>(TestError::INVALID_OUTPUT_VECTOR)
-                  << " - incorrect output format\n" << RESET;
+                  << " - incorrect output format\n"                    << RESET;
     if (IS_ERROR(TestError::ALGORITHM_ERROR))
         std::cout << RED << "\t\t\t\tERROR CODE " << static_cast<uint64_t>(TestError::ALGORITHM_ERROR)
                   << " - the algorithm produced an incorrect result\n" << RESET;

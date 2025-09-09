@@ -18,7 +18,7 @@ static inline std::list<CacheCell>::iterator findReplacedCellIter(LFU& cache) {
     for (auto it = cache.begin(); it != cache.end(); ++it) {
         if (it->emptyFlag) return it; 
         if (best == cache.end()
-            || it->numberOfRequests < best->numberOfRequests
+            ||  it->numberOfRequests <  best->numberOfRequests
             || (it->numberOfRequests == best->numberOfRequests && it->lastAccessedTime < best->lastAccessedTime)) {
             best = it;
         }
@@ -34,20 +34,20 @@ void cachePut(LFU& cache, std::size_t key, int value) {
         ++(it->numberOfRequests);
         it->lastAccessedTime = cache.nextTick();
         it->emptyFlag = false;
-        cache.splice(cache.end(), cache, it);
+        cache.splice(cache.begin(), cache, it);
         return;
     }
 
     auto replacedCellIter = findReplacedCellIter(cache);
 
     if (replacedCellIter == cache.end()) 
-        cache.push_back(CacheCell{key, value, 1, cache.nextTick(), false});
+        cache.push_front(CacheCell{key, value, 1, cache.nextTick(), false});
     else {
         replacedCellIter->key              = key;
         replacedCellIter->value            = value;
         replacedCellIter->numberOfRequests = 1;
         replacedCellIter->lastAccessedTime = cache.nextTick();
         replacedCellIter->emptyFlag        = false;
-        cache.splice(cache.end(), cache, replacedCellIter);
+        cache.splice(cache.begin(), cache, replacedCellIter);
     }
 }

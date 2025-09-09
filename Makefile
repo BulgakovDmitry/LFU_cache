@@ -64,14 +64,14 @@ clean:
 #--------------------------------------------------------------------------------------------------
 .PHONY: help
 help:
-	printf '%s\n' \
-	"Основные цели:"  \
-	"  make         - собрать всё" \
-	"  make run     - собрать и запустить lfu.out c --interface" \
-	"  make testRun - собрать и запустить тесты tests.out" \
-	"  make lfu     - собрать LFU алгоритм" \
-	"  make test    - собрать тесты" \
-	"  make clean   - очистить build/obj/ && build/bin/" 
+	printf '%s\n'                                                 \
+	"Main goals:" 									              \
+	"  make         - compile all"                                \
+	"  make run     - compile and run {lfu.out} with --interface" \
+	"  make testRun - compile and run tests {tests.out}"          \
+	"  make lfu     - compile LFU algorithm"                      \
+	"  make test    - compile tests"                              \
+	"  make clean   - clean build/obj/ and build/bin/" 
 #--------------------------------------------------------------------------------------------------
 
 

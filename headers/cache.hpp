@@ -4,7 +4,7 @@
 #include <list>
 #include <cstddef>
 
-typedef std::size_t Tick_t;
+using Tick_t = std::size_t;
 
 struct CacheCell {
     std::size_t key;
@@ -23,12 +23,12 @@ public:
 
     ~LFU() = default;
 
+    inline std::size_t nextTick    ()       noexcept { return ++tick;       }
     inline std::size_t getCacheSize() const noexcept { return cacheSize;    }
-    inline std::size_t nextTick    () noexcept       { return ++tick;       }
     inline std::size_t dataSize    () const noexcept { return data.size (); }
     inline bool        empty       () const noexcept { return data.empty(); }
 
-    inline void push_back(const CacheCell& value) { data.push_back(value); }
+    inline void push_front(const CacheCell& value) { data.push_front(value); }
 
     inline std::list<CacheCell>::iterator       begin()       noexcept { return data.begin (); }
     inline std::list<CacheCell>::const_iterator begin() const noexcept { return data.cbegin(); }
