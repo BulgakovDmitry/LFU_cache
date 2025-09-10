@@ -1,3 +1,6 @@
+#ifndef COLORS_HPP
+#define COLORS_HPP
+
 #define RESET   "\033[0m"
 #define RED     "\033[1;31m"
 #define MANG    "\033[1;35m"
@@ -14,3 +17,5 @@
 #define _BLUE  (T) "\033[1;34m" T "\033[0m"
 #define _CEAN  (T) "\033[1;36m" T "\033[0m"
 #define _YELLOW(T) "\033[1;33m" T "\033[0m"
+
+#endif
