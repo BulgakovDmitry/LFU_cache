@@ -162,7 +162,7 @@ Explanation of the basic principles of the algorithm:
 
 ## 📂 Project Structure
 ```
-LFU/
+LFU_cache/
 ├── headers/            # Header files
 ├── src/                # Source code
 │
