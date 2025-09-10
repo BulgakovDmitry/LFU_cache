@@ -15,15 +15,15 @@
 
 ## 🚀 Quick Start:
 
-To download, compile and run the program with the “--interface” flag, enter:
+To download, compile and run the program without the “--interface” flag, enter:
 ```cpp
 git clone https://github.com/BulgakovDmitry/LFU_cache
 cd LFU_cache
-make run_with_interface
-```
-To compile and run without an interface, replace make run_with_interface with:
-```cpp
 make run
+```
+To compile and run with an interface (flag “--interface”), replace make run with:
+```cpp
+make run_with_interface
 ```
 
 The program also features a convenient testing system for this algorithm, which provides detailed logs in case of errors.
