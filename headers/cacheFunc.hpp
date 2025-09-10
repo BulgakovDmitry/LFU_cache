@@ -5,12 +5,15 @@
 #include <list>            
 #include "cache.hpp"   
 #include <functional>    
-#include <bits/std_abs.h>
 
 const std::size_t KEY_NO_FOUND = 0;
 
 template<typename KeyType, typename ValueType>
-inline KeyType getKey(ValueType value) { return std::abs(static_cast<long>(value) + 1); } //static_cast<KeyType>(std::hash<ValueType>()(value)); }
+inline KeyType getKey(const ValueType& value) {
+    std::size_t hash = std::hash<ValueType>{}(value);
+    return static_cast<KeyType>(hash + std::size_t{1});
+}
+
 
 template<typename KeyType, typename ValueType>
 void cachePut(LFU<KeyType, ValueType>& cache, KeyType key, ValueType value);
@@ -27,22 +30,26 @@ template<typename KeyType, typename ValueType>
 static inline typename std::list<CacheCell<KeyType, ValueType>>::iterator 
 findKeyIter(LFU<KeyType, ValueType>& cache, const KeyType& key)  {
     auto it = cache.find(key);
-
-    if (it == cache.end())
-        return it;
-
-    if (it->emptyFlag || it->key != key) {
-        cache.eraseKey(key);
-        cache.eraseIt(it);            
-        return cache.end();
+    if (it != cache.end()) {
+        if (!it->emptyFlag && it->key == key)
+             return it;
     }
 
-    return it;
+    for (auto scan = cache.begin(); scan != cache.end(); ++scan) {
+        if (!scan->emptyFlag && scan->key == key) {
+            cache.indexKeyIt(key, scan);   
+            return scan;
+        }
+    }
+
+    cache.eraseKey(key);
+    return cache.end();
 }
 
 template<typename KeyType, typename ValueType>
 static inline typename std::list<CacheCell<KeyType, ValueType>>::iterator 
 findReplacedCellIter(LFU<KeyType, ValueType>& cache) {
+    if (cache.getCacheSize() == 0)               return cache.end();
     if (cache.dataSize() < cache.getCacheSize()) return cache.end();
 
     auto best = cache.end();

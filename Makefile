@@ -33,6 +33,8 @@ FLAGS := -D _DEBUG -ggdb3 -std=c++17 -O0 -Wall -Wextra -Weffc++ -Waggressive-loo
 	     -Wswitch-default -Wswitch-enum -Wsync-nand -Wundef -Wunreachable-code -Wunused -Wuseless-cast -Wvariadic-macros              \
 	     -Wno-literal-suffix -Wno-missing-field-initializers -Wno-narrowing -Wno-old-style-cast -Wno-varargs -Wstack-protector        \
 	     $(SANITAZER)
+
+FLAGS_RELEASE := -O2 -DNDEBUG
 #--------------------------------------------------------------------------------------------------
 
 
