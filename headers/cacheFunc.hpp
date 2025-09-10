@@ -1,22 +1,23 @@
 #ifndef CACHE_FUNC_HPP
 #define CACHE_FUNC_HPP
 
-#include <bits/std_abs.h> 
 #include <cstdlib>         
 #include <list>            
-#include "cache.hpp"       
+#include "cache.hpp"   
+#include <functional>    
+#include <bits/std_abs.h>
 
 const std::size_t KEY_NO_FOUND = 0;
 
 template<typename KeyType, typename ValueType>
-inline KeyType getKey(ValueType value) { return std::abs(static_cast<long>(value) + 1); };
+inline KeyType getKey(ValueType value) { return std::abs(static_cast<long>(value) + 1); } //static_cast<KeyType>(std::hash<ValueType>()(value)); }
 
 template<typename KeyType, typename ValueType>
 void cachePut(LFU<KeyType, ValueType>& cache, KeyType key, ValueType value);
 
 template<typename KeyType, typename ValueType>
 static inline typename std::list<CacheCell<KeyType, ValueType>>::iterator 
-findKeyIter(LFU<KeyType, ValueType>& cache, KeyType key); 
+findKeyIter(LFU<KeyType, ValueType>& cache, const KeyType& key);
 
 template<typename KeyType, typename ValueType>
 static inline typename std::list<CacheCell<KeyType, ValueType>>::iterator 
@@ -24,11 +25,19 @@ findReplacedCellIter(LFU<KeyType, ValueType>& cache);
 
 template<typename KeyType, typename ValueType> 
 static inline typename std::list<CacheCell<KeyType, ValueType>>::iterator 
-findKeyIter(LFU<KeyType, ValueType>& cache, KeyType key)  {
-    for (auto it = cache.begin(); it != cache.end(); ++it) 
-        if (!it->emptyFlag && it->key == key) return it;
+findKeyIter(LFU<KeyType, ValueType>& cache, const KeyType& key)  {
+    auto it = cache.find(key);
 
-    return cache.end();
+    if (it == cache.end())
+        return it;
+
+    if (it->emptyFlag || it->key != key) {
+        cache.eraseKey(key);
+        cache.eraseIt(it);            
+        return cache.end();
+    }
+
+    return it;
 }
 
 template<typename KeyType, typename ValueType>
@@ -57,6 +66,8 @@ void cachePut(LFU<KeyType, ValueType>& cache, KeyType key, ValueType value) {
         ++(it->numberOfRequests);
         it->lastAccessedTime = cache.nextTick();
         it->emptyFlag = false;
+
+        cache.indexKeyIt(key, it);
         cache.splice(cache.begin(), cache, it);
         cache.cacheHit();
         return;
@@ -64,15 +75,21 @@ void cachePut(LFU<KeyType, ValueType>& cache, KeyType key, ValueType value) {
 
     auto replacedCellIter = findReplacedCellIter(cache);
 
-    if (replacedCellIter == cache.end()) 
+    if (replacedCellIter == cache.end()) {
         cache.push_front(CacheCell<KeyType, ValueType>{key, value, 1, cache.nextTick(), false});
-    else {
+        auto newIt = cache.begin();
+        cache.indexKeyIt(key, newIt);
+    } else {
+        if (!replacedCellIter->emptyFlag) 
+            cache.eraseKey(replacedCellIter->key);
+
         replacedCellIter->key              = key;
         replacedCellIter->value            = value;
         replacedCellIter->numberOfRequests = 1;
         replacedCellIter->lastAccessedTime = cache.nextTick();
         replacedCellIter->emptyFlag        = false;
         cache.splice(cache.begin(), cache, replacedCellIter);
+        cache.indexKeyIt(key, replacedCellIter);
     }
 }
 
