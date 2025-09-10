@@ -1,11 +1,11 @@
-#include <stdlib.h>                  // for EXIT_FAILURE
-#include <cstring>                   // for size_t, strlen, strncmp
-#include <iostream>                  // for operator<<, basic_ostream, char_...
-#include <myLib.hpp>                 // for BLUE, RESET, GREEN, YELLOW
-#include <vector>                    // for vector
-#include "../headers/cache.hpp"      // for LFU
-#include "../headers/cacheDump.hpp"  // for consoleDump, graphDump
-#include "../headers/cacheFunc.hpp"  // for cachePut, getKey
+#include <stdlib.h>                 
+#include <cstring>                   
+#include <iostream>                 
+#include "../common/colors.hpp"               
+#include <vector>                    
+#include "../headers/cache.hpp"      
+#include "../headers/cacheDump.hpp"  
+#include "../headers/cacheFunc.hpp" 
 
 int main(int argc, const char* argv[]) {
     if (!argc) return EXIT_FAILURE;
@@ -23,7 +23,7 @@ int main(int argc, const char* argv[]) {
     std::size_t nItems = 0;
     std::cin >> nItems;
 
-    LFU cache(cacheSize);
+    LFU<std::size_t, int> cache(cacheSize);
 
     std::vector<int> vec = {};
     
@@ -36,11 +36,11 @@ int main(int argc, const char* argv[]) {
     }
 
     for (std::size_t i = 0; i < nItems; ++i)
-        cachePut(cache, getKey(vec[i]), vec[i]);
+        cachePut(cache, getKey<std::size_t, int>(vec[i]), vec[i]);
 
     if (interface) {
         consoleDump(cache);
-        graphDump(vec, cacheSize);
+        graphDump<std::size_t, int>(vec, cacheSize);
         std::cout << BLUE << "out: " << YELLOW << cache.getNumberOfHits() << std::endl << RESET; 
     }
     else

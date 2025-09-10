@@ -2,14 +2,14 @@
 #include <stdint.h>                  
 #include <iostream>                 
 #include <list>                      
-#include <myLib.hpp>                
-#include "../headers/cache.hpp"      
-#include "../headers/cacheFunc.hpp"  
+#include "../../common/colors.hpp"                
+#include "../../headers/cache.hpp"      
+#include "../../headers/cacheFunc.hpp"  
 
 static TestResult testVerify       (uint64_t testStatus);
 static void       printErrorLog    (uint64_t testStatus);
-static void       printAlgorithmLog(const LFU& cache, Test test);
-static void       printOutputLog   (const LFU& cache, Test test);
+static void       printAlgorithmLog(const LFU<std::size_t, int>& cache, Test test);
+static void       printOutputLog   (const LFU<std::size_t, int>& cache, Test test);
 
 static TestResult test             (const Test& test, uint64_t& testStatus);
 static TestResult inputTest        (const Test& test, uint64_t& testStatus);
@@ -38,7 +38,7 @@ static void printErrorLog(uint64_t testStatus) {
 }
 #undef IS_ERROR
 
-static void printAlgorithmLog(const LFU& cache, Test test) {
+static void printAlgorithmLog(const LFU<std::size_t, int>& cache, Test test) {
     std::cout << RED << "\t\t\t\texpected [ " << RESET;
     for (std::size_t k = 0; k < test.cacheSize; ++k)
         std::cout << YELLOW << test.outputVec[k] << ' ' << RESET;
@@ -49,7 +49,7 @@ static void printAlgorithmLog(const LFU& cache, Test test) {
     std::cout << RED << "]\n" << RESET;
 }
 
-static void printOutputLog(const LFU& cache, Test test) {
+static void printOutputLog(const LFU<std::size_t, int>& cache, Test test) {
     std::cout << RED    << "\t\t\t\texpected number of hits " 
               << YELLOW << test.numberOfHits
               << RED    << " and got " 
@@ -95,10 +95,10 @@ static TestResult inputTest(const Test& test, uint64_t& testStatus) {
 static TestResult algorithmicTest(const Test& test, uint64_t& testStatus) {
     std::cout << MANG << "\talgor test\t" << RESET;
 
-    LFU cache(test.cacheSize);
+    LFU<std::size_t, int> cache(test.cacheSize);
 
     for (std::size_t i = 0; i < test.nItems; ++i)
-        cachePut(cache, getKey(test.inputVec[i]), test.inputVec[i]);
+        cachePut(cache, getKey<std::size_t, int>(test.inputVec[i]), test.inputVec[i]);
 
     std::size_t i = 0;
     for (auto it = cache.begin(); it != cache.end(); ++it) {

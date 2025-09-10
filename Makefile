@@ -8,7 +8,6 @@ CXX = g++
 #--------------------------------------------------------------------------------------------------
 SRC   := src/
 HPP   := headers/
-LIB   := myLib/
 BUILD := build/
 TESTS := tests/
 OBJ   := $(BUILD)obj/
@@ -17,8 +16,7 @@ BIN   := $(BUILD)bin/
 
 
 #--------------------------------------------------------------------------------------------------
-INCLUDE_FLAGS := -I$(LIB) -I$(HPP) 
-SANITAZER     := -fsanitize=address
+SANITAZER := -fsanitize=address
 
 FLAGS := -D _DEBUG -ggdb3 -std=c++17 -O0 -Wall -Wextra -Weffc++ -Waggressive-loop-optimizations -Wc++14-compat -Wmissing-declarations \
 	     -Wcast-align -Wcast-qual -Wchar-subscripts -Wconditionally-supported -Wctor-dtor-privacy -Wempty-body -Wfloat-equal          \
@@ -27,15 +25,7 @@ FLAGS := -D _DEBUG -ggdb3 -std=c++17 -O0 -Wall -Wextra -Weffc++ -Waggressive-loo
 	     -Wstrict-overflow=2 -Wsuggest-attribute=noreturn -Wsuggest-final-methods -Wsuggest-final-types -Wsuggest-override            \
 	     -Wswitch-default -Wswitch-enum -Wsync-nand -Wundef -Wunreachable-code -Wunused -Wuseless-cast -Wvariadic-macros              \
 	     -Wno-literal-suffix -Wno-missing-field-initializers -Wno-narrowing -Wno-old-style-cast -Wno-varargs -Wstack-protector        \
-	     $(INCLUDE_FLAGS)                                                                                                             \
 	     $(SANITAZER)
-#--------------------------------------------------------------------------------------------------
-
-
-#--------------------------------------------------------------------------------------------------
-LFU_OBJ   := $(OBJ)cacheFunc.o $(OBJ)cacheDump.o
-MYLIB_OBJ := $(OBJ)myLib.o
-TEST_OBJ  := $(OBJ)tests.o $(LFU_OBJ) $(MYLIB_OBJ)
 #--------------------------------------------------------------------------------------------------
 
 
@@ -47,8 +37,8 @@ all: lfu
 run: lfu
 	./$(BIN)lfu.out 
 
-.PHONY: run_
-run_: lfu
+.PHONY: run_with_interface
+run_with_interface: lfu
 	./$(BIN)lfu.out  --interface
 
 
@@ -69,33 +59,29 @@ clean:
 #--------------------------------------------------------------------------------------------------
 .PHONY: help
 help:
-	printf '%s\n'                                                 \
-	"Main goals:" 									              \
-	"  make         - compile all"                                \
-	"  make run_    - compile and run {lfu.out} with --interface" \
-	"  make run     - compile and run {lfu.out}"                  \
-	"  make testRun - compile and run tests {tests.out}"          \
-	"  make lfu     - compile LFU algorithm"                      \
-	"  make test    - compile tests"                              \
-	"  make clean   - clean build/obj/ and build/bin/" 
+	printf '%s\n'                                                            \
+	"Main goals:" 									                         \
+	"  make                    - compile all"                                \
+	"  make run_with_interface - compile and run {lfu.out} with --interface" \
+	"  make run                - compile and run {lfu.out}"                  \
+	"  make test               - compile and run tests {tests.out}"          \
+	"  make lfu                - compile LFU algorithm"                      \
+	"  make clean              - clean build/obj/ and build/bin/" 
 #--------------------------------------------------------------------------------------------------
 
 
 #--------------------------------------------------------------------------------------------------
 .PHONY: lfu 
-lfu: $(LFU_OBJ) $(MYLIB_OBJ) $(OBJ)main.o
+lfu: $(OBJ)main.o
 	$(CXX) $^ -o $(BIN)lfu.out $(FLAGS)
 
 .PHONY: tests
-tests: $(TEST_OBJ) $(MYLIB_OBJ) $(OBJ)testsMain.o
+tests: $(OBJ)tests.o $(OBJ)testsMain.o
 	$(CXX) $^ -o $(BIN)tests.out $(FLAGS)
 #--------------------------------------------------------------------------------------------------
 
 
 #--------------------------------------------------------------------------------------------------
-$(OBJ)%.o : $(LIB)%.cpp
-	$(CXX) $(FLAGS) -c $< -o $@
-
 $(OBJ)%.o : $(SRC)%.cpp
 	$(CXX) $(FLAGS) -c $< -o $@	
 
