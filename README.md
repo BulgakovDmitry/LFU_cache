@@ -164,7 +164,7 @@ struct CacheCell {
 
 ## 📂 Структура проекта
 ```
-LFU/
+LFU_cache/
 ├── headers/            # Header files
 ├── src/                # Source code
 │
