@@ -174,7 +174,7 @@ LFU_cache/
 │   ├── obj/            # object files
 │   └── bin/            # executable files
 │
-├── myLib/              # my castom library
+├── common/             # common files 
 │
 └── Makefile/           # Makefile           
 ```
