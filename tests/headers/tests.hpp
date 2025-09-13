@@ -10,6 +10,8 @@ struct Test {
     std::vector<int> outputVec;
 };
 
+const std::size_t DASH = 0; 
+
 enum class TestError {
     OK                       = 0,
     NIL_CACHE_SIZE           = 1 << 0,
@@ -25,6 +27,13 @@ enum class TestResult {
     TEST_FAILURE = 1
 };
 
-void testsRun(const std::vector<Test>& dataBase, std::size_t NUMBER_OF_TESTS);
+namespace CacheLFU {
+    void testsRun(const std::vector<Test>& dataBase, 
+                        std::size_t NUMBER_OF_TESTS);
+};
+namespace CacheIdeal {
+    void testsRun(const std::vector<Test>& dataBase, 
+                        std::size_t NUMBER_OF_TESTS);
+};
 
 #endif

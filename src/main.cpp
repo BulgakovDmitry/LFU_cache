@@ -7,6 +7,8 @@
 #include "../headers/cacheDump.hpp"  
 #include "../headers/cacheFunc.hpp" 
 
+#include "../headers/idealCache.hpp"
+
 int main(int argc, const char* argv[]) {
     if (!argc) return EXIT_FAILURE;
 
@@ -35,6 +37,11 @@ int main(int argc, const char* argv[]) {
         vec.push_back(value);
     }
 
+    //--------------------------------------------
+    IdealCache<int> icache(cacheSize, vec);
+    idealCacheDump<int>(cache.getCacheSize(), vec);
+    //--------------------------------------------
+
     for (std::size_t i = 0; i < nItems; ++i)
         cachePut(cache, getKey<std::size_t, int>(vec[i]), vec[i]);
 
@@ -45,5 +52,4 @@ int main(int argc, const char* argv[]) {
     }
     else
         std::cout << cache.getNumberOfHits() << std::endl; 
-
 }

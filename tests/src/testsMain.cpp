@@ -1,6 +1,7 @@
 #include "../headers/tests.hpp"
 #include <vector>
 
+namespace CacheLFU {
 static const std::vector<Test> dataBase = {{
     {3, 5,  0, {1, 2, 3, 4, 5},                             {5, 4, 3}          },
     {3, 8,  3, {1, 2, 3, 1, 2, 1, 4, 5},                    {5, 1, 2}          },
@@ -19,10 +20,24 @@ static const std::vector<Test> dataBase = {{
     {4, 8,  2, {1, 2, 3, 4, 2, 5, 2, 6},                    {6, 2, 5, 4}       },
     {3, 7,  2, {1, 2, 3, 2, 2, 4, 5},                       {5, 4, 2}          },
     {6, 5,  2, {11, 1, 1, 1, 9},                            {9, 1, 11, 1, 1, 1}}, 
-    {1, 12, 2, {8, 9, 10, 9, 4, 12, 8, 5, 3, 3, 13, 13},    {13}               },
+    {1, 12, 2, {8, 9, 10, 9, 4, 12, 8, 5, 3, 3, 13, 13},    {13}               }
 }};
+};
+
+namespace CacheIdeal {
+static const std::vector<Test> dataBase = {{
+    {1, DASH, 0, {1, 42},                              {DASH}},
+    {1, DASH, 0, {1, 2},                               {DASH}},
+    {2, DASH, 1, {1, 2, 1},                            {DASH}},
+    {2, DASH, 0, {1, 2, 3},                            {DASH}},
+    {2, DASH, 2, {1, 2, 3, 2, 1},                      {DASH}},
+    {4, DASH, 3, {1, 2, 3, 1, 2, 3},                   {DASH}},
+    {3, DASH, 4, {1, 2, 3, 4, 1, 2, 5, 1, 2, 3, 4, 5}, {DASH}}
+}};
+};
 
 
 int main() {
-    testsRun(dataBase, dataBase.size()); 
+    CacheLFU::  testsRun(CacheLFU  ::dataBase, CacheLFU  ::dataBase.size()); 
+    CacheIdeal::testsRun(CacheIdeal::dataBase, CacheIdeal::dataBase.size());
 }

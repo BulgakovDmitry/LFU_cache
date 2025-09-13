@@ -28,8 +28,9 @@ public:
 
     ~IdealCache() = default;
 
-    inline void cacheHit() noexcept { ++numberOfHits_; }
-
+    inline void       cacheHit        () noexcept       { ++numberOfHits_;     }
+    inline std::size_t getNumberOfHits() const noexcept { return numberOfHits_; }
+    
     void process() {
         if (processed_) return;
         if (cacheSize_ == 0) {
@@ -56,9 +57,8 @@ public:
 
             auto& cur = cursors_[req]; 
             auto& occ = occurrences_[req];
-            while (cur < occ.size() && occ[cur] <= i) {
+            while (cur < occ.size() && occ[cur] <= i) 
                 ++cur;
-            }
         }
 
         processed_ = true;
@@ -68,11 +68,17 @@ public:
         process();
         const std::size_t total = requests_.size();
 
-        std::cout << MANG << "Ideal cache"       << RED " {"          << RESET << '\n';
-        std::cout << MANG << "   Cache size:\t " << cacheSize_    << RESET << '\n';
-        std::cout << MANG << "   Requests:\t "   << total         << RESET << '\n';
-        std::cout << MANG << "   Hits:\t "       << numberOfHits_ << RESET << '\n';
-        std::cout << RED  << "}"                                << RESET << std::endl;
+        std::cout << MANG << "Ideal cache"       << RED << " {"             << RESET << '\n';
+        std::cout << MANG << "   Data:\t "                                 << RESET;
+
+        for (const auto& elem : cache_) 
+            std::cout << YELLOW << elem << RESET " ";
+        std::cout << std::endl;
+        
+        std::cout << MANG << "   Cache size:\t " << YELLOW << cacheSize_    << RESET << '\n';
+        std::cout << MANG << "   Requests:\t "   << YELLOW << total         << RESET << '\n';
+        std::cout << MANG << "   Hits:\t "       << YELLOW << numberOfHits_ << RESET << '\n';
+        std::cout << RED  << "}"                                            << RESET << std::endl;
     }
 
 private:
@@ -111,14 +117,13 @@ private:
         return vec[cur];
     }
 
-    std::size_t cacheSize_;
-    std::vector<ValueType> requests_;
-
+    std::size_t                   cacheSize_;
+    std::vector<ValueType>        requests_;
     std::unordered_set<ValueType> cache_;
-    std::size_t numberOfHits_;
-
+    std::size_t                   numberOfHits_;
+    
     std::unordered_map<ValueType, std::vector<std::size_t>> occurrences_;
-    std::unordered_map<ValueType, std::size_t> cursors_;
+    std::unordered_map<ValueType, std::size_t>              cursors_;
 
     bool processed_;
 };
