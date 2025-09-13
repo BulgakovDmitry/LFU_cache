@@ -1,6 +1,6 @@
 <div align="center">
   
-  # 🛡️ Implementation of the LFU caching algorithm in C++
+  # Implementation of the LFU caching algorithm in C++
   
   ![GitHub code size](https://img.shields.io/github/languages/code-size/BulgakovDmitry/LFU_cache)  
   
@@ -12,7 +12,7 @@
 1. [Russian](/README.md)
 2. [English](/README-en.md)
 
-## 🚀 Quick Start:
+## Quick Start:
 
 To download, compile and run the program without the “--interface” flag, enter:
 ```cpp
@@ -36,7 +36,7 @@ To view detailed information about the main purposes of make, you can enter:
 make help
 ```
 
-## ✨ This is important
+## This is important
 The program implements a detailed sequential graphical dump of the algorithm using graphviz.
 
 To quickly install graphviz on Linux, enter the following command line:
@@ -45,7 +45,7 @@ sudo apt update
 sudo apt install graphviz
 ```
 
-## 💡 About Dump
+## About Dump
 With its help, you can obtain the following information: let's start our cache for int type data:
 
 <div align="center">
@@ -73,7 +73,7 @@ template<typename KeyType, typename ValueType>
 void        graphDump             (const std::vector<ValueType>& vec, std::size_t cacheSize);
 ```
 
-## 🔍 Overview
+## Overview
 Class definition:
 ```cpp
 template<typename KeyType, typename ValueType> 
@@ -159,7 +159,17 @@ Explanation of the basic principles of the algorithm:
 | `emptyFlag`      | number of cache hits    |
 | `hashTable`   | hash table for fast searching of element by key |
 
-## 📂 Project Structure
+## Comparison of the selected caching algorithm with the ideal one
+In order to have something to compare the efficiency of the implemented LFU caching algorithm with, an ideal caching algorithm that “knows the future” has been created.
+A convenient dump has been created for it to quickly and easily obtain information about the values in the cache and cache hits.
+<div align="center">
+  <img src="docs/idcache.png" alt="Id cache Banner" width="1000">
+</div>
+As we can see, with one set of data, our algorithm shows 2 cache hits, while the ideal caching algorithm “catches” 5 hits.
+
+Translated with DeepL.com (free version)
+
+## Project Structure
 ```
 LFU_cache/
 ├── headers/            # Header files
