@@ -37,10 +37,10 @@ int main(int argc, const char* argv[]) {
         vec.push_back(value);
     }
 
-    //--------------------------------------------
-    IdealCache<int> icache(cacheSize, vec);
-    idealCacheDump<int>(cache.getCacheSize(), vec);
-    //--------------------------------------------
+    if (interface) {
+        IdealCache<int> icache(cacheSize, vec);
+        idealCacheDump<int>(cache.getCacheSize(), vec);
+    }
 
     for (std::size_t i = 0; i < nItems; ++i)
         cachePut(cache, getKey<std::size_t, int>(vec[i]), vec[i]);
