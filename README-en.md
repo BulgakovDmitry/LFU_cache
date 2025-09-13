@@ -167,7 +167,6 @@ A convenient dump has been created for it to quickly and easily obtain informati
 </div>
 As we can see, with one set of data, our algorithm shows 2 cache hits, while the ideal caching algorithm “catches” 5 hits.
 
-Translated with DeepL.com (free version)
 
 ## Project Structure
 ```
