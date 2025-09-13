@@ -1,6 +1,6 @@
 <div align="center">
   
-  # Реализация алгоритма кеширования на языке С++
+  # Реализация алгоритма кеширования LFU на языке С++
   ![GitHub code size](https://img.shields.io/github/languages/code-size/BulgakovDmitry/LFU_cache)  
 </div>
 
