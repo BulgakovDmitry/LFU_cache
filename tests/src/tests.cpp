@@ -13,11 +13,11 @@ static void       printAlgorithmLog(const LFU<std::size_t, int>& cache, Test tes
 static void       printOutputLog   (const LFU<std::size_t, int>& cache, Test test);
 
 namespace CacheLFU {
-static TestResult test             (const Test& test, uint64_t& testStatus);
+    static TestResult test         (const Test& test, uint64_t& testStatus);
 };
 
 namespace CacheIdeal {
-static TestResult test             (const Test& test, uint64_t& testStatus);
+    static TestResult test         (const Test& test, uint64_t& testStatus);
 };
 
 static TestResult inputTest        (const Test& test, uint64_t& testStatus);
@@ -131,75 +131,76 @@ static TestResult algorithmicTest(const Test& test, uint64_t& testStatus) {
 }
 
 namespace CacheLFU {
-static TestResult test(const Test& test, uint64_t& testStatus) {
-    TestResult resultStatus = inputTest(test, testStatus);
-    if (resultStatus == TestResult::TEST_SUCCESS) {
-        resultStatus = algorithmicTest(test, testStatus);
-        if (resultStatus == TestResult::TEST_SUCCESS)
-            std::cout << GREEN << "<Test successfully completed>\n" << RESET;
+    static TestResult test(const Test& test, uint64_t& testStatus) {
+        TestResult resultStatus = inputTest(test, testStatus);
+        if (resultStatus == TestResult::TEST_SUCCESS) {
+            resultStatus = algorithmicTest(test, testStatus);
+            if (resultStatus == TestResult::TEST_SUCCESS)
+                std::cout << GREEN << "<Test successfully completed>\n" << RESET;
+            else
+                std::cout << RED << "<failed test>\n" << RESET;
+        } 
         else
             std::cout << RED << "<failed test>\n" << RESET;
-    } 
-    else
-        std::cout << RED << "<failed test>\n" << RESET;
-    std::cout << std::endl;
-    return resultStatus;
-}
+        std::cout << std::endl;
+        return resultStatus;
+    }
 };
 
 namespace CacheIdeal {
-static TestResult test(const Test& test, uint64_t& testStatus) {
-    IdealCache<int> icache(test.cacheSize, test.inputVec);
-    icache.process();
+    static TestResult test(const Test& test, uint64_t& testStatus) {
+        IdealCache<int> icache(test.cacheSize, test.inputVec);
+        icache.process();
 
-    if (icache.getNumberOfHits() != test.numberOfHits) {
-        testStatus |= static_cast<uint64_t>(TestError::INCORRECT_NUMBER_OF_HITS);
+        if (icache.getNumberOfHits() != test.numberOfHits) {
+            testStatus |= static_cast<uint64_t>(TestError::INCORRECT_NUMBER_OF_HITS);
+        }
+
+        return testVerify(testStatus);
     }
-
-    return testVerify(testStatus);
-}
 };
 
 namespace CacheLFU {
-void testsRun(const std::vector<Test>& dataBase, std::size_t NUMBER_OF_TESTS) {
-    std::cout << CEAN << "___________________________LFU_CACHE_TESTING___________________________\n" <<  RESET;
+    void testsRun(const std::vector<Test>& dataBase, std::size_t NUMBER_OF_TESTS) {
+        std::cout << CEAN << "___________________________LFU_CACHE_TESTING___________________________\n" <<  RESET;
 
-    uint64_t testStatus   = 0;
-    uint64_t resultStatus = 0;
+        uint64_t testStatus   = 0;
+        uint64_t resultStatus = 0;
 
-    for (std::size_t i = 0; i < NUMBER_OF_TESTS; ++i) {
-        std::cout << BLUE << "test (" << GREEN << i + 1 << BLUE << ')' << RED << ":\n" << RESET;
-        resultStatus += static_cast<uint64_t>(CacheLFU::test(dataBase[i], testStatus));
+        for (std::size_t i = 0; i < NUMBER_OF_TESTS; ++i) {
+            std::cout << BLUE << "test (" << GREEN << i + 1 << BLUE << ')' << RED << ":\n" << RESET;
+            resultStatus += static_cast<uint64_t>(CacheLFU::test(dataBase[i], testStatus));
+        }
+
+        std::cout << CEAN << "LFU CACHE --- TESTS RESULT: " << RESET;
+        if (resultStatus) {
+            std::cout << RED << "FAILURE \t[ " << YELLOW << resultStatus 
+                      << RED << " test (tests) ended with an error ]" << RESET << std::endl;
+        }
+        else 
+            std::cout << GREEN << "SUCCESS" << RESET << std::endl;
     }
-
-    std::cout << CEAN << "TESTS RESULT: " << RESET;
-    if (resultStatus) {
-        std::cout << RED << "FAILURE \t[ " << YELLOW << resultStatus 
-                  << RED << " test (tests) ended with an error ]" << RESET << std::endl;
-    }
-    else 
-        std::cout << GREEN << "SUCCESS" << RESET << std::endl;
-}
 };
 
 namespace CacheIdeal {
-void testsRun(const std::vector<Test>& dataBase, std::size_t NUMBER_OF_TESTS) {
-    std::cout << CEAN << "___________________________IDEAL_CACHE_TESTING___________________________\n" <<  RESET;
+    void testsRun(const std::vector<Test>& dataBase, std::size_t NUMBER_OF_TESTS) {
+        std::cout << CEAN << "___________________________IDEAL_CACHE_TESTING___________________________\n" <<  RESET;
 
-    uint64_t testStatus   = 0;
-    uint64_t resultStatus = 0;
+        uint64_t testStatus   = 0;
+        uint64_t resultStatus = 0;
 
-    for (std::size_t i = 0; i < NUMBER_OF_TESTS; ++i) {
-        std::cout << BLUE << "test (" << GREEN << i + 1 << BLUE << ')' << RED << ":\n" << RESET;
-        resultStatus += static_cast<uint64_t>(CacheIdeal::test(dataBase[i], testStatus));
+        for (std::size_t i = 0; i < NUMBER_OF_TESTS; ++i) {
+            std::cout << BLUE << "test (" << GREEN << i + 1 << BLUE << ')' << RED << ":\t" << RESET;
+            resultStatus += static_cast<uint64_t>(CacheIdeal::test(dataBase[i], testStatus));
+            testStatus = 0;
+        }
+
+        std::cout << CEAN << "IDEAL CACHE --- TESTS RESULT:   " << RESET;
+        if (resultStatus) {
+            std::cout << RED << "FAILURE \t[ " << YELLOW << resultStatus 
+                      << RED << " test (tests) ended with an error ]" << RESET << std::endl;
+        }
+        else 
+            std::cout << GREEN << "SUCCESS" << RESET << std::endl;
     }
-
-    std::cout << CEAN << "TESTS RESULT: " << RESET;
-    if (resultStatus) {
-        std::cout << RED << "FAILURE \t[ " << YELLOW << resultStatus 
-                  << RED << " test (tests) ended with an error ]" << RESET << std::endl;
-    }
-    else 
-        std::cout << GREEN << "SUCCESS" << RESET << std::endl;
-}
 };
