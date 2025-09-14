@@ -4,6 +4,8 @@
 #include <list>
 #include <cstddef>
 #include <unordered_map>
+#include <utility>
+#include <stdexcept>
 
 using Tick_t = std::size_t;
 
@@ -21,20 +23,21 @@ struct CacheCell {
 template<typename KeyType, typename ValueType> 
 class LFU {
 public:
-    explicit LFU(std::size_t cacheSize_) noexcept
-        : cacheSize(cacheSize_), tick(0), data{}, numberOfHits(0), hashTable{} {}
+    explicit LFU(std::size_t cacheSize_, bool interfaseFlag_) noexcept
+        : cacheSize(cacheSize_), tick(0), data{}, numberOfHits(0), hashTable{}, interfaseFlag(interfaseFlag_) {}
 
     ~LFU() = default;
 
     using ListIt      = typename std::list<CacheCell<KeyType, ValueType>>::iterator;
     using ListConstIt = typename std::list<CacheCell<KeyType, ValueType>>::const_iterator;
 
-    inline void        cacheHit       ()       noexcept {        ++numberOfHits; }
-    inline std::size_t nextTick       ()       noexcept { return ++tick;         }
-    inline std::size_t getNumberOfHits() const noexcept { return numberOfHits;   }
-    inline std::size_t getCacheSize   () const noexcept { return cacheSize;      }
-    inline std::size_t dataSize       () const noexcept { return data.size ();   }
-    inline bool        empty          () const noexcept { return data.empty();   }
+    inline void        cacheHit        ()       noexcept {        ++numberOfHits; }
+    inline std::size_t nextTick        ()       noexcept { return ++tick;         }
+    inline std::size_t getNumberOfHits () const noexcept { return numberOfHits;   }
+    inline std::size_t getCacheSize    () const noexcept { return cacheSize;      }
+    inline std::size_t dataSize        () const noexcept { return data.size ();   }
+    inline bool        empty           () const noexcept { return data.empty();   }
+    inline bool        getInterfaceFlag() const noexcept { return interfaseFlag;  }
 
     inline void push_front(const CacheCell<KeyType, ValueType>& value) { data.push_front(value); }
 
@@ -63,6 +66,7 @@ public:
         data.erase(it);
     }
 
+
 private:
     std::size_t                              cacheSize;
     Tick_t                                   tick;
@@ -71,6 +75,7 @@ private:
     std::unordered_map<
         KeyType, 
         ListIt>                              hashTable;
+    bool                                     interfaseFlag;
 };
 
 #endif

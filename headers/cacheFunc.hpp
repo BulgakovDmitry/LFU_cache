@@ -75,7 +75,10 @@ void cachePut(LFU<KeyType, ValueType>& cache, KeyType key, ValueType value) {
         it->emptyFlag = false;
 
         cache.indexKeyIt(key, it);
-        cache.splice(cache.begin(), cache, it);
+        
+        if (cache.getInterfaceFlag())
+            cache.splice(cache.begin(), cache, it);
+
         cache.cacheHit();
         return;
     }
@@ -95,7 +98,10 @@ void cachePut(LFU<KeyType, ValueType>& cache, KeyType key, ValueType value) {
         replacedCellIter->numberOfRequests = 1;
         replacedCellIter->lastAccessedTime = cache.nextTick();
         replacedCellIter->emptyFlag        = false;
-        cache.splice(cache.begin(), cache, replacedCellIter);
+
+        if (cache.getInterfaceFlag()) 
+            cache.splice(cache.begin(), cache, replacedCellIter);
+            
         cache.indexKeyIt(key, replacedCellIter);
     }
 }

@@ -103,7 +103,7 @@ static TestResult inputTest(const Test& test, uint64_t& testStatus) {
 static TestResult algorithmicTest(const Test& test, uint64_t& testStatus) {
     std::cout << MANG << "\talgor test\t" << RESET;
 
-    LFU<std::size_t, int> cache(test.cacheSize);
+    LFU<std::size_t, int> cache(test.cacheSize, true);
 
     for (std::size_t i = 0; i < test.nItems; ++i)
         cachePut(cache, getKey<std::size_t, int>(test.inputVec[i]), test.inputVec[i]);

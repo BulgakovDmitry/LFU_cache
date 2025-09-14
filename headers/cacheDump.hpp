@@ -67,7 +67,7 @@ void consoleGeneralizedDump(const LFU<KeyType, ValueType>& cache) {
 
 template<typename KeyType, typename ValueType>
 void consoleFullDump(const std::vector<ValueType>& vec, std::size_t cacheSize) {
-    LFU<KeyType, ValueType> tempCache(cacheSize);
+    LFU<KeyType, ValueType> tempCache(cacheSize, true);
 
     std::cout << MANG "________________________Console full dump________________________\n" RESET; 
 
@@ -81,7 +81,7 @@ template<typename KeyType, typename ValueType>
 static void dumpListNodes(std::ofstream& gv, const std::vector<ValueType>& vec, std::size_t cacheSize) {
     assert(gv && "Unable to write in gv file");
     
-    LFU<KeyType, ValueType> tempCache(cacheSize);
+    LFU<KeyType, ValueType> tempCache(cacheSize, true);
     std::size_t i = 0;
     for (; i < vec.size(); ++i) {
         cachePut<KeyType, ValueType>(tempCache, getKey<KeyType, ValueType>(vec[i]), vec[i]);

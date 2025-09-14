@@ -10,6 +10,7 @@
 #include "../headers/idealCache.hpp"
 
 int main(int argc, const char* argv[]) {
+
     if (!argc) return EXIT_FAILURE;
 
     bool interface = false;
@@ -25,7 +26,7 @@ int main(int argc, const char* argv[]) {
     std::size_t nItems = 0;
     std::cin >> nItems;
 
-    LFU<std::size_t, int> cache(cacheSize);
+    LFU<std::size_t, int> cache(cacheSize, interface);
 
     std::vector<int> vec = {};
     
