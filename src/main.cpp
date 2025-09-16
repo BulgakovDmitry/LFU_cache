@@ -16,7 +16,12 @@ int main(int argc, const char* argv[]) {
     bool interface = false;
     if(argv[1] && strncmp(argv[1], "--interface", strlen("--interface")) == 0) interface = true;
 
-    if (interface) std::cout << BLUE << "Please enter the cache size:" << RESET;
+    if (interface) 
+        std::cout << BLUE << "Please enter the cache size:" << RESET;
+    else {
+        std::ios::sync_with_stdio(false);
+        std::cin.tie(nullptr);
+    }
     
     std::size_t cacheSize = 0;
     std::cin >> cacheSize;
@@ -38,10 +43,10 @@ int main(int argc, const char* argv[]) {
         vec.push_back(value);
     }
 
-    if (interface) {
-        IdealCache<int> icache(cacheSize, vec);
-        idealCacheDump<int>(cache.getCacheSize(), vec);
-    }
+    // if (interface) {
+    //     IdealCache<int> icache(cacheSize, vec);
+    //     idealCacheDump<int>(cache.getCacheSize(), vec);
+    // }
 
     for (std::size_t i = 0; i < nItems; ++i)
         cachePut(cache, getKey<std::size_t, int>(vec[i]), vec[i]);
