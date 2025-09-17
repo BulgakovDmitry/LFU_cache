@@ -7,7 +7,6 @@
 #include <string>                    
 #include <vector>                
 #include "../common/colors.hpp"     
-#include "../headers/cacheFunc.hpp"  
 #include "cache.hpp"                 
 #include <fstream>
 
@@ -81,10 +80,10 @@ template<typename KeyType, typename ValueType>
 static void dumpListNodes(std::ofstream& gv, const std::vector<ValueType>& vec, std::size_t cacheSize) {
     assert(gv && "Unable to write in gv file");
     
-    LFU<KeyType, ValueType> tempCache(cacheSize, true);
+    LFU<KeyType, ValueType> tempCache(cacheSize);
     std::size_t i = 0;
     for (; i < vec.size(); ++i) {
-        cachePut<KeyType, ValueType>(tempCache, getKey<KeyType, ValueType>(vec[i]), vec[i]);
+        tempCache.cachePut(tempCache.getKey(vec[i]), vec[i]);
         gv << "\tnode_" << i << " [shape=Mrecord; style = filled; fillcolor = palegreen;";
         gv << "color = \"#000000\"; fontcolor = \"#000000\";  label=\" {";
         for (auto it = tempCache.begin(); it != tempCache.end(); ++it) 

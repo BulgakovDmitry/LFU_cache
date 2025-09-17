@@ -5,7 +5,6 @@
 #include "../../common/colors.hpp"                
 #include "../../headers/cache.hpp"     
 #include "../../headers/idealCache.hpp" 
-#include "../../headers/cacheFunc.hpp"  
 
 static TestResult testVerify       (uint64_t testStatus);
 static void       printErrorLog    (uint64_t testStatus);
@@ -103,10 +102,10 @@ static TestResult inputTest(const Test& test, uint64_t& testStatus) {
 static TestResult algorithmicTest(const Test& test, uint64_t& testStatus) {
     std::cout << MANG << "\talgor test\t" << RESET;
 
-    LFU<std::size_t, int> cache(test.cacheSize, true);
+    LFU<std::size_t, int> cache(test.cacheSize);
 
     for (std::size_t i = 0; i < test.nItems; ++i)
-        cachePut(cache, getKey<std::size_t, int>(test.inputVec[i]), test.inputVec[i]);
+    cache.cachePut(cache.getKey(test.inputVec[i]), test.inputVec[i]);
 
     std::size_t i = 0;
     for (auto it = cache.begin(); it != cache.end(); ++it) {

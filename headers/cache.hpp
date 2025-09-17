@@ -2,8 +2,10 @@
 #define CACHE_STRUCT_HPP
 
 #include <list>
+#include <cstdlib>  
 #include <cstddef>
 #include <unordered_map>
+#include <functional> 
 #include <utility>
 #include <stdexcept>
 #include <map>
@@ -25,11 +27,13 @@ template<typename KeyType, typename ValueType>
 class LFU {
 public:
 
-    using Cell        = CacheCell<KeyType, ValueType>;
-    using List        = std::list<Cell>;
-    using ListIt      = typename List::iterator;
-    using ListConstIt = typename List::const_iterator;
-    using Metric_t    = std::pair<size_t, Tick_t>;
+    const std::size_t KEY_NO_FOUND = 0;
+
+    using Cell         = CacheCell<KeyType, ValueType>;
+    using List         = std::list<Cell>;
+    using ListIt       = typename List::iterator;
+    using ListConstIt  = typename List::const_iterator;
+    using Metric_t     = std::pair<size_t, Tick_t>;
 
     struct MetricComp {
         bool operator()(const Metric_t& lhs, const Metric_t& rhs) const {
@@ -38,14 +42,13 @@ public:
         }
     };
 
-    using CacheFic = std::map<Metric_t, KeyType, MetricComp>;
+    using CacheFic     = std::map<Metric_t, KeyType, MetricComp>;
     using CacheFicIter = typename CacheFic::iterator;
 
-    explicit LFU(std::size_t capacity, bool interfaceFlag=false)
+    explicit LFU(std::size_t capacity)
         : cacheSize_(capacity)
         , tick_(0)
         , numberOfHits_(0)
-        , interfaseFlag_(interfaceFlag)
     {
         data_.clear();
         hashTable_.clear();
@@ -55,13 +58,11 @@ public:
 
     ~LFU() = default;
 
-    void        incHit          () noexcept       { ++numberOfHits_;       }
+    void        incHit          () noexcept       { ++numberOfHits_;        }
     std::size_t getCacheSize    () const noexcept { return cacheSize_;      }
     std::size_t dataSize        () const noexcept { return data_.size ();   }
     std::size_t getNumberOfHits () const noexcept { return numberOfHits_;   }
-    bool        getInterfaceFlag() const noexcept { return interfaseFlag_;  }
 
-    void        cacheHit        ()       noexcept {        ++numberOfHits_; }
     std::size_t nextTick        ()       noexcept { return ++tick_;         }
     bool        empty           () const noexcept { return data_.empty();   }
 
@@ -72,51 +73,35 @@ public:
     ListIt       end  ()       noexcept { return data_.end   (); }
     ListConstIt  end  () const noexcept { return data_.cend  (); }
 
-    CacheFicIter getCacheFicBegin() { return cacheFic_.begin(); }
-    CacheFicIter getCacheFicEnd  () { return cacheFic_.end();   }
+    CacheFicIter getCacheFicBegin() noexcept { return cacheFic_.begin(); }
+    CacheFicIter getCacheFicEnd  () noexcept { return cacheFic_.end();   }
 
     void splice_to_front(ListIt it) {
-        if (it != data_.begin()) data_.splice(data_.begin(), data_, it);
+        if (it != begin()) data_.splice(begin(), data_, it);
     }
 
-    ListIt      find(const KeyType& key) {
-        auto hit = hashTable_.find(key);
-        return (hit == hashTable_.end()) ? data_.end() : hit->second;
-    }
-
-    ListConstIt find(const KeyType& key) const {
-        auto hit = hashTable_.find(key);
-        return (hit == hashTable_.end()) ? data_.end() : hit->second;
-    }
-
-    void indexKeyIt(const KeyType& key, ListIt it) { hashTable_[key] = it; }
-
-    void eraseIndex(const KeyType& key) { hashTable_.erase(key); }
-    
-    inline void eraseIt(ListIt it) {
-        if (it == data_.end()) return;
-        hashTable_.erase(it->key);
-        data_.erase(it);
-    }
+    void   putIterByKey(const KeyType& key, ListIt it) { hashTable_[key] = it; }
 
     ListIt getIterByKey(const KeyType& key) {
         auto it = hashTable_.find(key);
-        return (it == hashTable_.end()) ? data_.end() : it->second;
+        return (it == hashTable_.end()) ? end() : it->second;
     }
 
+    void eraseIndex(const KeyType& key) { hashTable_.erase(key); }
+
     ListIt pushNew(const KeyType& key, const ValueType& value, Tick_t now) {
-        data_.push_front(Cell{key, value, 1u, now, false});
-        auto it = data_.begin();
-        indexKeyIt(key, it);
+        push_front(Cell{key, value, 1u, now, false});
+        auto it = begin();
+        putIterByKey(key, it);
         cacheFicPut(it->numberOfRequests, it->lastAccessedTime, key);
         return it;
     }
 
     void cacheFicPut(std::size_t numberOfRequests, Tick_t lastAccessedTime, const KeyType& key) {
         auto km = keyToMetric_.find(key);
-        if (km != keyToMetric_.end()) {
+        if (km != keyToMetric_.end()) 
             cacheFic_.erase(km->second);
-        }
+        
         Metric_t m{numberOfRequests, lastAccessedTime};
         cacheFic_.insert({m, key});
         keyToMetric_[key] = m;
@@ -130,6 +115,62 @@ public:
         }
     }
 
+    KeyType getKey(const ValueType& value) {
+        std::size_t hash = std::hash<ValueType>{}(value);
+        return static_cast<KeyType>(hash + std::size_t{1});
+    }
+
+    typename LFU<KeyType, ValueType>::ListIt 
+    findKeyIter(const KeyType& key) { return getIterByKey(key);}
+
+    typename LFU<KeyType, ValueType>::ListIt
+    findReplacedCellIter() {
+        if (getCacheSize() == 0)         return end();
+        if (dataSize() < getCacheSize()) return end();
+
+        auto ficIt = getCacheFicBegin();
+        if (ficIt == getCacheFicEnd())   return end();
+
+        const KeyType& victimKey = ficIt->second;
+        return findKeyIter(victimKey);
+    }
+
+    void cachePut(KeyType key, ValueType value) {
+        if (getCacheSize() == 0) return;
+
+        auto it = findKeyIter(key);
+        if (it != end()) {
+            incHit();
+            cacheFicEraseByKey(key);
+            ++it->numberOfRequests;
+            it->lastAccessedTime  = nextTick();
+            cacheFicPut(it->numberOfRequests, it->lastAccessedTime, key);
+            splice_to_front(it);
+            return;
+        }
+
+        if (dataSize() < getCacheSize()) {
+            pushNew(key, value, nextTick());
+            return;
+        }
+
+        auto victim = findReplacedCellIter();
+        if (victim == end()) {
+            pushNew(key, value, nextTick());
+            return;
+        }
+
+        cacheFicEraseByKey(victim->key);
+
+        eraseIndex(victim->key); 
+        *victim = Cell{key, value, 1, nextTick(), false};
+
+        putIterByKey(key, victim);
+        cacheFicPut(victim->numberOfRequests, victim->lastAccessedTime, key);
+
+        splice_to_front(victim);
+    }
+
 private:
     std::size_t                              cacheSize_;
     Tick_t                                   tick_;
@@ -138,10 +179,9 @@ private:
     std::unordered_map<
         KeyType, 
         ListIt>                              hashTable_;
-    bool                                     interfaseFlag_;
 
-    std::map<Metric_t, KeyType, MetricComp> cacheFic_;
-    std::unordered_map<KeyType, Metric_t> keyToMetric_;
+    std::map<Metric_t, KeyType, MetricComp>  cacheFic_;
+    std::unordered_map<KeyType, Metric_t>    keyToMetric_;
 };
 
 #endif

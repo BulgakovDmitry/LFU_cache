@@ -5,7 +5,6 @@
 #include <vector>                    
 #include "../headers/cache.hpp"      
 #include "../headers/cacheDump.hpp"  
-#include "../headers/cacheFunc.hpp" 
 
 #include "../headers/idealCache.hpp"
 
@@ -31,7 +30,7 @@ int main(int argc, const char* argv[]) {
     std::size_t nItems = 0;
     std::cin >> nItems;
 
-    LFU<std::size_t, int> cache(cacheSize, interface);
+    LFU<std::size_t, int> cache(cacheSize);
 
     std::vector<int> vec = {};
     
@@ -49,7 +48,7 @@ int main(int argc, const char* argv[]) {
     // }
 
     for (std::size_t i = 0; i < nItems; ++i)
-        cachePut(cache, getKey<std::size_t, int>(vec[i]), vec[i]);
+        cache.cachePut(cache.getKey(vec[i]), vec[i]);
 
     if (interface) {
         consoleDump(cache);
