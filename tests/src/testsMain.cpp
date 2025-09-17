@@ -39,5 +39,5 @@ namespace CacheIdeal {
 
 int main() {
     CacheLFU::  testsRun(CacheLFU  ::dataBase, CacheLFU  ::dataBase.size()); 
-    //CacheIdeal::testsRun(CacheIdeal::dataBase, CacheIdeal::dataBase.size());
+    CacheIdeal::testsRun(CacheIdeal::dataBase, CacheIdeal::dataBase.size());
 }

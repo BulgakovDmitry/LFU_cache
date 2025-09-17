@@ -26,7 +26,6 @@ struct CacheCell {
 template<typename KeyType, typename ValueType> 
 class LFU {
 public:
-
     const std::size_t KEY_NO_FOUND = 0;
 
     using Cell         = CacheCell<KeyType, ValueType>;

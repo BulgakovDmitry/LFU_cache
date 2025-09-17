@@ -5,10 +5,10 @@ digraph G {
     bgcolor="lemonchiffon";
 
 	node_0 [shape=Mrecord; style = filled; fillcolor = palegreen;color = "#000000"; fontcolor = "#000000";  label=" {1 | step 1} "];
-	node_1 [shape=Mrecord; style = filled; fillcolor = palegreen;color = "#000000"; fontcolor = "#000000";  label=" {2 | 1 | step 2} "];
-	node_2 [shape=Mrecord; style = filled; fillcolor = palegreen;color = "#000000"; fontcolor = "#000000";  label=" {3 | 2 | 1 | step 3} "];
-	node_3 [shape=Mrecord; style = filled; fillcolor = palegreen;color = "#000000"; fontcolor = "#000000";  label=" {4 | 3 | 2 | step 4} "];
-	node_4 [shape=Mrecord; style = filled; fillcolor = palegreen;color = "#000000"; fontcolor = "#000000";  label=" {5 | 4 | 3 | step 5} "];
+	node_1 [shape=Mrecord; style = filled; fillcolor = palegreen;color = "#000000"; fontcolor = "#000000";  label=" {3 | 1 | step 2} "];
+	node_2 [shape=Mrecord; style = filled; fillcolor = palegreen;color = "#000000"; fontcolor = "#000000";  label=" {2 | 3 | 1 | step 3} "];
+	node_3 [shape=Mrecord; style = filled; fillcolor = palegreen;color = "#000000"; fontcolor = "#000000";  label=" {1 | 2 | 3 | step 4} "];
+	node_4 [shape=Mrecord; style = filled; fillcolor = palegreen;color = "#000000"; fontcolor = "#000000";  label=" {2 | 1 | 3 | step 5} "];
 	node_5 [shape=Mrecord; style = filled; fillcolor = palegreen;color = "#000000"; fontcolor = "#000000";  label=" { end }"];
 
 	node_0 -> node_1

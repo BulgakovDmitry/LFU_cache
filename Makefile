@@ -32,9 +32,13 @@ FLAGS_DEBUG := -D _DEBUG -ggdb3 -std=c++17 -O0 -Wall -Wextra -Weffc++ -Waggressi
 	     	   -Wstrict-overflow=2 -Wsuggest-attribute=noreturn -Wsuggest-final-methods -Wsuggest-final-types -Wsuggest-override            \
 	     	   -Wswitch-default -Wswitch-enum -Wsync-nand -Wundef -Wunreachable-code -Wunused -Wuseless-cast -Wvariadic-macros              \
 	     	   -Wno-literal-suffix -Wno-missing-field-initializers -Wno-narrowing -Wno-old-style-cast -Wno-varargs -Wstack-protector        \
-	     $(SANITAZER)
+	     		$(SANITAZER)
 
 FLAGS_RELEASE := -O2 -DNDEBUG
+
+FLAGS_OPTIMIZ := -O2 -g -fno-omit-frame-pointer
+# valgrind --tool=callgrind ./myprog arg1 arg2
+# kcachegrind callgrind.out.12345
 #--------------------------------------------------------------------------------------------------
 
 
@@ -69,7 +73,7 @@ clean:
 help:
 	printf '%s\n'                                                            \
 	"Main goals:" 									                         \
-	"  make                    - compile all"                                \
+	"  make all                - compile all"                                \
 	"  make run_with_interface - compile and run {lfu.out} with --interface" \
 	"  make run                - compile and run {lfu.out}"                  \
 	"  make test               - compile and run tests {tests.out}"          \
