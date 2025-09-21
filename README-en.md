@@ -1,32 +1,36 @@
 <div align="center">
   
-  # Implementation of the LFU caching algorithm in C++
-  
+  # LFU Cache Algorithm Implementation in C++
   ![GitHub code size](https://img.shields.io/github/languages/code-size/BulgakovDmitry/LFU_cache)  
-  
-  
 </div>
 
-## Other languages
+## Other Languages
 
 1. [Russian](/README.md)
 2. [English](/README-en.md)
 
-## Quick Start:
+## Installation and Build:
 
-To download, compile and run the program without the “--interface” flag, enter:
+To install, compile, and run without an interface, enter:
 ```cpp
 git clone https://github.com/BulgakovDmitry/LFU_cache
 cd LFU_cache
-make run
-```
-To compile and run with an interface (flag “--interface”), replace make run with:
-```cpp
-make run_with_interface
+make run_LFU
 ```
 
-The program also features a convenient testing system for this algorithm, which provides detailed logs in case of errors.
-To run the built-in tests:
+To compile and run with an interface (with the flag --interface), replace make make run_LFU with:
+```cpp
+make run_LFU_with_interface
+```
+
+To compile and run the ideal cache, enter
+```cpp
+make run_ideal
+```
+
+The program also includes a built-in testing system, which provides detailed logs in case of an error.
+
+To run the built-in tests, enter:
 ```cpp
 make test
 ```
@@ -122,13 +126,15 @@ Explanation of the basic principles of the algorithm:
 | `hashTable`   | hash table for fast searching of element by key |
 
 ## Comparison of the selected caching algorithm with the ideal one
-In order to have something to compare the efficiency of the implemented LFU caching algorithm with, an ideal caching algorithm that “knows the future” has been created.
-A convenient dump has been created for it to quickly and easily obtain information about the values in the cache and cache hits.
-<div align="center">
-  <img src="docs/idcache.png" alt="Id cache Banner" width="1000">
-</div>
-As we can see, with one set of data, our algorithm shows 2 cache hits, while the ideal caching algorithm “catches” 5 hits.
-
+To evaluate the efficiency of the LFU caching algorithm, an ideal caching algorithm (that "knows the future") was also implemented.
+Both algorithms were given the same input data:
+| Data                                                                 | LFU Cache (hits) | Ideal Cache (hits) |
+| -------------------------------------------------------------------- | ---------------- | ------------------ |
+| 3 5 1 2 3 4 5                                                        | 0                | 0                  |
+| 3 8 1 2 3 1 2 1 4 5                                                  | 3                | 3                  |
+| 1 12 8 9 10 9 4 12 8 5 3 3 13 13                                     | 2                | 3                  |
+| 4 12 1 2 3 4 1 2 5 1 2 4 3 4                                         | 6                | 7                  |
+| 5 30 4 2 1 2 5 4 1 6 3 2 10 2 9 2 7 5 10 2 6 1 0 1 2 4 10 5 9 10 2 5 | 12               | 18                 |
 
 ## Project Structure
 ```
