@@ -15,7 +15,7 @@ To install, compile, and run without an interface, enter:
 ```cpp
 git clone https://github.com/BulgakovDmitry/LFU_cache
 cd LFU_cache
-make make run_LFU
+make run_LFU
 ```
 
 To compile and run with an interface (with the flag --interface), replace make make run_LFU with:
