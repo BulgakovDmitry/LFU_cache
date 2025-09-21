@@ -15,11 +15,11 @@
 ```cpp
 git clone https://github.com/BulgakovDmitry/LFU_cache
 cd LFU_cache
-make run
+make make run_LFU
 ```
-Для компиляции и запуска c интерфейсом (с флагом “--interface”) замените make run на
+Для компиляции и запуска c интерфейсом (с флагом “--interface”) замените make make run_LFU на
 ```cpp
-make run_with_interface
+make run_LFU_with_interface
 ```
 
 Программа также имеет встроенную систему тестирования, которая при ошибке выдает подробные логи с информацией.
