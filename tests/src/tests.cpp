@@ -63,6 +63,13 @@ static void printOutputLog(const LFU<std::size_t, int>& cache, Test test) {
               << YELLOW << cache.getNumberOfHits() << std::endl << RESET;
 }
 
+static void printLog(const Test& test, std::size_t hits) {
+    std::cout << RED    << "\t\t\t\texpected number of hits " 
+              << YELLOW << test.numberOfHits
+              << RED    << " and got " 
+              << YELLOW << hits << std::endl << RESET;
+}
+
 static TestResult testVerify(uint64_t testStatus) {
     std::cout << CEAN << "verification... " << RESET;
     if (testStatus == static_cast<uint64_t>(TestError::OK)) {
@@ -148,14 +155,21 @@ namespace CacheLFU {
 
 namespace CacheIdeal {
     static TestResult test(const Test& test, uint64_t& testStatus) {
-        IdealCache<int> icache(test.cacheSize, test.inputVec);
-        icache.process();
+        IdealCache<int, int> icache(test.cacheSize);
 
-        if (icache.getNumberOfHits() != test.numberOfHits) {
+        for (int k : test.inputVec) 
+            icache.lookupUpdate(k);
+
+        icache.cacheRun();
+
+        if (icache.getCacheHits() != test.numberOfHits) 
             testStatus |= static_cast<uint64_t>(TestError::INCORRECT_NUMBER_OF_HITS);
-        }
 
-        return testVerify(testStatus);
+        TestResult res = testVerify(testStatus);
+        if (res != TestResult::TEST_SUCCESS)
+            printLog(test, icache.getCacheHits());
+
+        return res;
     }
 };
 

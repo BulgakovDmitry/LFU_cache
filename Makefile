@@ -44,16 +44,19 @@ FLAGS_OPTIMIZ := -O2 -g -fno-omit-frame-pointer
 
 #--------------------------------------------------------------------------------------------------
 .PHONY: all
-all: lfu
+all: lfu id tests
 
-.PHONY: run
-run: lfu
+.PHONY: run_LFU
+run_LFU: lfu
 	./$(BIN)lfu.out 
 
-.PHONY: run_with_interface
-run_with_interface: lfu
-	./$(BIN)lfu.out  --interface
+.PHONY: run_ideal
+run_ideal: id
+	./$(BIN)id.out 
 
+.PHONY: run_LFU_with_interface
+run_LFU_with_interface: lfu
+	./$(BIN)lfu.out  --interface
 
 .PHONY: tests
 test: tests
@@ -71,32 +74,38 @@ clean:
 #--------------------------------------------------------------------------------------------------
 .PHONY: help
 help:
-	printf '%s\n'                                                            \
-	"Main goals:" 									                         \
-	"  make all                - compile all"                                \
-	"  make run_with_interface - compile and run {lfu.out} with --interface" \
-	"  make run                - compile and run {lfu.out}"                  \
-	"  make test               - compile and run tests {tests.out}"          \
-	"  make lfu                - compile LFU algorithm"                      \
-	"  make clean              - clean build/obj/ and build/bin/" 
+	printf '%s\n'                                                                \
+	"Main goals:" 									                             \
+	"  make all                    - compile all"                                \
+	"  make run_LFU_with_interface - compile and run {lfu.out} with --interface" \
+	"  make run_LFU                - compile and run {lfu.out}"                  \
+	"  make run_ideal              - compile and run {id.out}"                   \
+	"  make test                   - compile and run tests {tests.out}"          \
+	"  make lfu                    - compile LFU algorithm"                      \
+	"  make id                     - compile ideal algorithm"                    \
+	"  make clean                  - clean build/obj/ and build/bin/" 
 #--------------------------------------------------------------------------------------------------
 
 
 #--------------------------------------------------------------------------------------------------
 .PHONY: lfu 
 lfu: $(OBJ)main.o | dirs
-	$(CXX) $^ -o $(BIN)lfu.out $(FLAGS_RELEASE)
+	$(CXX) $^ -o $(BIN)lfu.out $(FLAGS_DEBUG)
+
+.PHONY: id
+id: $(OBJ)idCacheMain.o | dirs
+	$(CXX) $^ -o $(BIN)id.out $(FLAGS_DEBUG)
 
 .PHONY: tests
 tests: $(OBJ)tests.o $(OBJ)testsMain.o | dirs
-	$(CXX) $^ -o $(BIN)tests.out $(FLAGS_RELEASE)
+	$(CXX) $^ -o $(BIN)tests.out $(FLAGS_DEBUG)
 #--------------------------------------------------------------------------------------------------
 
 
 #--------------------------------------------------------------------------------------------------
 $(OBJ)%.o : $(SRC)%.cpp | dirs
-	$(CXX) $(FLAGS_RELEASE) -c $< -o $@	
+	$(CXX) $(FLAGS_DEBUG) -c $< -o $@	
 
 $(OBJ)%.o : $(TESTS)$(SRC)%.cpp | dirs
-	$(CXX) $(FLAGS_RELEASE) -c $< -o $@
+	$(CXX) $(FLAGS_DEBUG) -c $< -o $@
 #--------------------------------------------------------------------------------------------------

@@ -1,0 +1,24 @@
+#include <iostream>
+#include "../headers/idealCache.hpp"
+
+int main() {
+    std::ios::sync_with_stdio(false);
+    std::cin.tie(nullptr);
+
+    std::size_t cacheSize;
+    std::size_t n;
+
+    if (!(std::cin >> cacheSize >> n)) 
+        throw std::runtime_error("incorrect input");
+
+    IdealCache<int, int> cache(cacheSize);
+    
+    int k = 0;
+    for (std::size_t i = 0; i < n; ++i) {
+        std::cin >> k;
+        cache.lookupUpdate(k);
+    }
+
+    cache.cacheRun();
+    std::cout << cache.getCacheHits() << std::endl;
+}

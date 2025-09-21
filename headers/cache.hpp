@@ -45,15 +45,13 @@ public:
     using CacheFicIter = typename CacheFic::iterator;
 
     explicit LFU(std::size_t capacity)
-        : cacheSize_(capacity)
-        , tick_(0)
-        , numberOfHits_(0)
-    {
-        data_.clear();
-        hashTable_.clear();
-        keyToMetric_.clear();
-        cacheFic_.clear();
-    }
+    : cacheSize_   (capacity)
+    , tick_        (0)
+    , data_        ()           
+    , numberOfHits_(0)
+    , hashTable_   ()          
+    , cacheFic_    ()           
+    , keyToMetric_ () {}
 
     ~LFU() = default;
 
@@ -79,7 +77,7 @@ public:
         if (it != begin()) data_.splice(begin(), data_, it);
     }
 
-    void   putIterByKey(const KeyType& key, ListIt it) { hashTable_[key] = it; }
+    void putIterByKey(const KeyType& key, ListIt it) { hashTable_[key] = it; }
 
     ListIt getIterByKey(const KeyType& key) {
         auto it = hashTable_.find(key);

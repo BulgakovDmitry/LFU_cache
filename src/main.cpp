@@ -5,7 +5,6 @@
 #include <vector>                    
 #include "../headers/cache.hpp"      
 #include "../headers/cacheDump.hpp"  
-
 #include "../headers/idealCache.hpp"
 
 int main(int argc, const char* argv[]) {
@@ -40,11 +39,6 @@ int main(int argc, const char* argv[]) {
     for (std::size_t i = 0; i < nItems; ++i) {
         std::cin >> value;
         vec.push_back(value);
-    }
-
-    if (interface) {
-        IdealCache<int> icache(cacheSize, vec);
-        idealCacheDump<int>(cache.getCacheSize(), vec);
     }
 
     for (std::size_t i = 0; i < nItems; ++i)
