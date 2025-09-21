@@ -15,7 +15,7 @@
 ```cpp
 git clone https://github.com/BulgakovDmitry/LFU_cache
 cd LFU_cache
-make make run_LFU
+make run_LFU
 ```
 Для компиляции и запуска c интерфейсом (с флагом “--interface”) замените make make run_LFU на
 ```cpp
