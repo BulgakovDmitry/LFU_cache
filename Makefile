@@ -90,22 +90,22 @@ help:
 #--------------------------------------------------------------------------------------------------
 .PHONY: lfu 
 lfu: $(OBJ)main.o | dirs
-	$(CXX) $^ -o $(BIN)lfu.out $(FLAGS_DEBUG)
+	$(CXX) $^ -o $(BIN)lfu.out $(FLAGS_RELEASE)
 
 .PHONY: id
 id: $(OBJ)idCacheMain.o | dirs
-	$(CXX) $^ -o $(BIN)id.out $(FLAGS_DEBUG)
+	$(CXX) $^ -o $(BIN)id.out $(FLAGS_RELEASE)
 
 .PHONY: tests
 tests: $(OBJ)tests.o $(OBJ)testsMain.o | dirs
-	$(CXX) $^ -o $(BIN)tests.out $(FLAGS_DEBUG)
+	$(CXX) $^ -o $(BIN)tests.out $(FLAGS_RELEASE)
 #--------------------------------------------------------------------------------------------------
 
 
 #--------------------------------------------------------------------------------------------------
 $(OBJ)%.o : $(SRC)%.cpp | dirs
-	$(CXX) $(FLAGS_DEBUG) -c $< -o $@	
+	$(CXX) $(FLAGS_RELEASE) -c $< -o $@	
 
 $(OBJ)%.o : $(TESTS)$(SRC)%.cpp | dirs
-	$(CXX) $(FLAGS_DEBUG) -c $< -o $@
+	$(CXX) $(FLAGS_RELEASE) -c $< -o $@
 #--------------------------------------------------------------------------------------------------
