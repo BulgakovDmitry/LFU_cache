@@ -1,5 +1,5 @@
 #include <iostream>
-#include "../headers/idealCache.hpp"
+#include "idealCache.hpp"
 
 int main() {
     std::ios::sync_with_stdio(false);

@@ -6,12 +6,12 @@
 #include <iostream>             
 #include <string>                    
 #include <vector>                
-#include "../common/colors.hpp"     
+#include "colors.hpp"     
 #include "cache.hpp"                 
 #include <fstream>
 
-const std::string DUMP_FILE_GV  = "graphDump/dump.gv";
-const std::string DUMP_FILE_PNG = "graphDump/dump.png";
+const std::string DUMP_FILE_GV  = "../graphDump/dump.gv";
+const std::string DUMP_FILE_PNG = "../graphDump/dump.png";
 
 template<typename KeyType, typename ValueType>
 void        consoleDump           (const LFU<KeyType, ValueType>& cache);

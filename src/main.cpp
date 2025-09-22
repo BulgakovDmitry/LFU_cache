@@ -1,11 +1,11 @@
 #include <stdlib.h>                 
 #include <cstring>                   
 #include <iostream>                 
-#include "../common/colors.hpp"               
+#include "colors.hpp"               
 #include <vector>                    
-#include "../headers/cache.hpp"      
-#include "../headers/cacheDump.hpp"  
-#include "../headers/idealCache.hpp"
+#include "cache.hpp"      
+#include "cacheDump.hpp"  
+#include "idealCache.hpp"
 
 int main(int argc, const char* argv[]) {
 
