@@ -162,8 +162,6 @@ namespace CacheIdeal {
 
         icache.cacheRun();
 
-        std::cout << MANG << "HITS " << icache.getCacheHits() << RESET << std::endl;
-
         if (icache.getCacheHits() != test.numberOfHits) 
             testStatus |= static_cast<uint64_t>(TestError::INCORRECT_NUMBER_OF_HITS);
 
