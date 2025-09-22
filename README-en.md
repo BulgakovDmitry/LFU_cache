@@ -15,24 +15,27 @@ To install, compile, and run without an interface, enter:
 ```cpp
 git clone https://github.com/BulgakovDmitry/LFU_cache
 cd LFU_cache
-make run_LFU
+cmake -S . -B build
+cd build
+cmake --build .
+./lfuCache 
 ```
 
 To compile and run with an interface (with the flag --interface), replace make make run_LFU with:
 ```cpp
-make run_LFU_with_interface
+./lfuCache --interface
 ```
 
 To compile and run the ideal cache, enter
 ```cpp
-make run_ideal
+./idCache 
 ```
 
 The program also includes a built-in testing system, which provides detailed logs in case of an error.
 
 To run the built-in tests, enter:
 ```cpp
-make test
+./test
 ```
 
 To view detailed information about the main purposes of make, you can enter:
