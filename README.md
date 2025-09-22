@@ -15,23 +15,26 @@
 ```cpp
 git clone https://github.com/BulgakovDmitry/LFU_cache
 cd LFU_cache
-make run_LFU
+cmake -S . -B build
+cd build
+cmake --build .
+./lfuCache 
 ```
-Для компиляции и запуска c интерфейсом (с флагом “--interface”) замените make make run_LFU на
+Для запуска c интерфейсом (с флагом “--interface”) замените ./lfuCache на
 ```cpp
-make run_LFU_with_interface
+./lfuCache --interface
 ```
 
-Для компиляции и запуска идеального кеша введите
+Для запуска идеального кеша введите
 ```cpp
-make run_ideal
+./idCache 
 ```
 
 Программа также имеет встроенную систему тестирования, которая при ошибке выдает подробные логи с информацией.
 
 Для запуска встроенных тестов введите:
 ```cpp
-make test
+./test
 ```
 
 Для просмотра основных целей makefile с кратким описанием введите:
