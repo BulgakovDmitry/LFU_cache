@@ -6,6 +6,8 @@
 #include "../../headers/cache.hpp"     
 #include "../../headers/idealCache.hpp" 
 
+namespace caches {
+
 static TestResult testVerify       (uint64_t testStatus);
 static void       printErrorLog    (uint64_t testStatus);
 static void       printAlgorithmLog(const LFU<std::size_t, int>& cache, Test test);
@@ -51,8 +53,13 @@ static void printAlgorithmLog(const LFU<std::size_t, int>& cache, Test test) {
         std::cout << YELLOW << test.outputVec[k] << ' ' << RESET;
     std::cout << RED << ']' << RESET;
     std::cout << RED << ", and got [ " << RESET;
-    for (auto it = cache.begin(); it != cache.end(); ++it)
-        std::cout << YELLOW << it->value << ' ' << RESET;
+    // for (auto it = cache.begin(); it != cache.end(); ++it)
+    //     std::cout << YELLOW << it->value << ' ' << RESET;
+
+    cache.for_each([&](const auto& cell) {
+        std::cout << YELLOW << cell.value << ' ' << RESET;
+    });
+
     std::cout << RED << "]\n" << RESET;
 }
 
@@ -112,14 +119,19 @@ static TestResult algorithmicTest(const Test& test, uint64_t& testStatus) {
     LFU<std::size_t, int> cache(test.cacheSize);
 
     for (std::size_t i = 0; i < test.nItems; ++i)
-    cache.cachePut(cache.getKey(test.inputVec[i]), test.inputVec[i]);
+    cache.cachePut(test.inputVec[i]);
 
     std::size_t i = 0;
-    for (auto it = cache.begin(); it != cache.end(); ++it) {
-        if (it->value != test.outputVec[i])
+    cache.for_each([&](const auto& cell) {
+        if (i >= test.outputVec.size()) {
             testStatus |= static_cast<uint64_t>(TestError::ALGORITHM_ERROR);
+            return;
+        }
+        if (cell.value != test.outputVec[i]) {
+            testStatus |= static_cast<uint64_t>(TestError::ALGORITHM_ERROR);
+        }
         ++i;
-    }
+    });
 
     if (cache.getNumberOfHits() != test.numberOfHits)
         testStatus |= static_cast<uint64_t>(TestError::INCORRECT_NUMBER_OF_HITS);
@@ -217,3 +229,5 @@ namespace CacheIdeal {
             std::cout << GREEN << "SUCCESS" << RESET << std::endl;
     }
 };
+
+} // namespace caches

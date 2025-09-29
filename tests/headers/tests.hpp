@@ -4,6 +4,8 @@
 #include <cstddef>  
 #include <vector>
 
+namespace caches {
+
 struct Test {
     std::size_t      cacheSize, nItems, numberOfHits;
     std::vector<int> inputVec;
@@ -36,4 +38,6 @@ namespace CacheIdeal {
                         std::size_t NUMBER_OF_TESTS);
 };
 
-#endif
+} // namespace caches
+
+#endif // LFU_TESTS_HPP

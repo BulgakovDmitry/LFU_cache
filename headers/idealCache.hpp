@@ -7,6 +7,8 @@
 #include <unordered_map>
 #include <vector>
 
+namespace caches {
+
 template <typename KeyType, typename ValueType>
 class IdealCache {
 public:
@@ -110,4 +112,6 @@ void IdealCache<KeyType, ValueType>::cacheRun() {
     }
 }
 
-#endif 
+} // namespace caches
+
+#endif // IDEAL_CACHE_HPP

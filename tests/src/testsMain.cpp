@@ -1,7 +1,7 @@
 #include "../headers/tests.hpp"
 #include <vector>
 
-namespace CacheLFU {
+namespace caches::CacheLFU {
     static const std::vector<Test> dataBase = {{
         {3, 5,  0, {1, 2, 3, 4, 5},                             {5, 4, 3}          },
         {3, 8,  3, {1, 2, 3, 1, 2, 1, 4, 5},                    {5, 1, 2}          },
@@ -24,7 +24,7 @@ namespace CacheLFU {
     }};
 };
 
-namespace CacheIdeal {
+namespace caches::CacheIdeal {
     static const std::vector<Test> dataBase = {{
         {1, DASH, 0, {1, 42},                              {DASH}},
         {1, DASH, 0, {1, 2},                               {DASH}},
@@ -38,6 +38,6 @@ namespace CacheIdeal {
 
 
 int main() {
-    CacheLFU::  testsRun(CacheLFU  ::dataBase, CacheLFU  ::dataBase.size()); 
-    CacheIdeal::testsRun(CacheIdeal::dataBase, CacheIdeal::dataBase.size());
+    caches::CacheLFU::  testsRun(caches::CacheLFU  ::dataBase, caches::CacheLFU  ::dataBase.size()); 
+    caches::CacheIdeal::testsRun(caches::CacheIdeal::dataBase, caches::CacheIdeal::dataBase.size());
 }

@@ -11,7 +11,7 @@ int main() {
     if (!(std::cin >> cacheSize >> n)) 
         throw std::runtime_error("incorrect input");
 
-    IdealCache<int, int> cache(cacheSize);
+    caches::IdealCache<int, int> cache(cacheSize);
     
     int k = 0;
     for (std::size_t i = 0; i < n; ++i) {

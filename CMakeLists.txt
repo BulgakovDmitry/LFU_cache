@@ -3,6 +3,9 @@
 cmake_minimum_required(VERSION 3.14)
 project(cache)
 
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 function(add_debug_flags TGT) 
     set (DEBUG_FLAGS 
         -D _DEBUG 

@@ -10,6 +10,8 @@
 #include "cache.hpp"                 
 #include <fstream>
 
+namespace caches {
+
 const std::string DUMP_FILE_GV  = "../graphDump/dump.gv";
 const std::string DUMP_FILE_PNG = "../graphDump/dump.png";
 
@@ -33,9 +35,11 @@ static void dumpConnectNodes      (std::ofstream& gv, std::size_t vecSize);
 template<typename KeyType, typename ValueType>
 void consoleDump(const LFU<KeyType, ValueType>& cache) {
     std::cout << MANG << "Console dump" << RED << ": " << RESET;
-    
-    for (auto it = cache.begin(); it != cache.end(); ++it) 
-        std::cout << YELLOW << it->value << RESET << " ";
+
+    cache.for_each([&](const auto& cell) {
+        std::cout << YELLOW << cell.value << RESET << " ";
+    });
+        
     std::cout << std::endl;
 }
 
@@ -83,11 +87,11 @@ static void dumpListNodes(std::ofstream& gv, const std::vector<ValueType>& vec, 
     LFU<KeyType, ValueType> tempCache(cacheSize);
     std::size_t i = 0;
     for (; i < vec.size(); ++i) {
-        tempCache.cachePut(tempCache.getKey(vec[i]), vec[i]);
+        tempCache.cachePut(vec[i]);
         gv << "\tnode_" << i << " [shape=Mrecord; style = filled; fillcolor = palegreen;";
         gv << "color = \"#000000\"; fontcolor = \"#000000\";  label=\" {";
-        for (auto it = tempCache.begin(); it != tempCache.end(); ++it) 
-            gv << it->value << " | ";
+        // for (auto it = tempCache.begin(); it != tempCache.end(); ++it) 
+        //     gv << it->value << " | ";
         gv << "step " << i + 1 << "} \"];\n";
     }
     gv << "\tnode_" << i << " [shape=Mrecord; style = filled; fillcolor = palegreen;";
@@ -122,4 +126,6 @@ void graphDump(const std::vector<ValueType>& vec, std::size_t cacheSize) {
     std::system(dotComand.c_str());
 }
 
-#endif
+} // namespace cahes
+
+#endif // CACHE_DUMP_HPP
