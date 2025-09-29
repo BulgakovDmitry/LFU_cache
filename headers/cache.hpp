@@ -108,7 +108,7 @@ public:
         }
     }
 
-    template <class Fn>
+    template <typename Fn>
     void for_each(Fn&& fn) {
         for (auto& cell : data_) {
             std::forward<Fn>(fn)(cell);
@@ -171,11 +171,6 @@ private:
         std::size_t hash = std::hash<ValueType>{}(value);
         return static_cast<KeyType>(hash + std::size_t{1});
     }
-
-    // void dumpState(std::ofstream& gv) {
-    //     for (auto it = tempCache.begin(); it != tempCache.end(); ++it) 
-    //         gv << it->value << " | ";
-    // }
 
     typename LFU<KeyType, ValueType>::ListIt 
     findKeyIter(const KeyType& key) { return getIterByKey(key);}
