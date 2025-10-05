@@ -88,7 +88,11 @@ add_debug_flags(test)
 set (RUN_LFU_WITH_INTERFACE run_LFU_with_interface)
 
 add_custom_target(${RUN_LFU_WITH_INTERFACE}
-	COMMAND ${CMAKE_BINARY_DIR}/lfuCache --inteface
+	COMMAND ${CMAKE_BINARY_DIR}/lfuCache --interface
 	COMMENT "compile and run {lfuCache} with --interface"
     DEPENDS lfuCache
 )
+
+target_compile_definitions(lfuCache PRIVATE PROJECT_SOURCE_DIR=\"${CMAKE_SOURCE_DIR}\")
+
+

@@ -1,19 +1,34 @@
 #ifndef CACHE_DUMP_HPP
 #define CACHE_DUMP_HPP
 
-#include <cassert>                 
 #include <cstdlib>                 
 #include <iostream>             
 #include <string>                    
 #include <vector>                
 #include "colors.hpp"     
-#include "cache.hpp"                 
+#include "cache.hpp"    
+#include <filesystem>             
 #include <fstream>
 
 namespace caches {
 
-const std::string DUMP_FILE_GV  = "../graphDump/dump.gv";
-const std::string DUMP_FILE_PNG = "../graphDump/dump.png";
+struct DumpPaths {
+    std::filesystem::path gv;
+    std::filesystem::path png;
+};
+
+inline DumpPaths makeDumpPaths(std::string_view basename = "dump") {
+    const char* env = std::getenv("GRAPH_DUMP_DIR");      
+    std::filesystem::path base = (env && *env) 
+        ? std::filesystem::path(env) 
+        : std::filesystem::path(PROJECT_SOURCE_DIR) / "graphDump";     
+
+        std::filesystem::create_directories(base); 
+    return {
+        base / (std::string(basename) + ".gv"),
+        base / (std::string(basename) + ".png")
+    };
+}
 
 template<typename KeyType, typename ValueType>
 void        consoleDump           (const LFU<KeyType, ValueType>& cache);
@@ -28,17 +43,17 @@ template<typename KeyType, typename ValueType>
 void        graphDump             (const std::vector<ValueType>& vec, std::size_t cacheSize);
 
 template<typename KeyType, typename ValueType>
-static void dumpListNodes         (std::ofstream& gv, const std::vector<ValueType>& vec, std::size_t cacheSize);
+void dumpListNodes         (std::ofstream& gv, const std::vector<ValueType>& vec, std::size_t cacheSize);
 
-static void dumpConnectNodes      (std::ofstream& gv, std::size_t vecSize);
+void dumpConnectNodes      (std::ofstream& gv, std::size_t vecSize);
 
 template<typename KeyType, typename ValueType>
 void consoleDump(const LFU<KeyType, ValueType>& cache) {
     std::cout << MANG << "Console dump" << RED << ": " << RESET;
 
-    cache.for_each([&](const auto& cell) {
-        std::cout << YELLOW << cell.value << RESET << " ";
-    });
+    for (const auto& cell : cache) {
+        std::cout << YELLOW << cell.value << RESET << ' ';
+    }
         
     std::cout << std::endl;
 }
@@ -80,34 +95,66 @@ void consoleFullDump(const std::vector<ValueType>& vec, std::size_t cacheSize) {
     }
 }
 
-template<typename KeyType, typename ValueType>
-static void dumpListNodes(std::ofstream& gv, const std::vector<ValueType>& vec, std::size_t cacheSize) {
-    assert(gv && "Unable to write in gv file");
-    
-    LFU<KeyType, ValueType> tempCache(cacheSize);
-    std::size_t i = 0;
-    for (; i < vec.size(); ++i) {
-        tempCache.cachePut(vec[i]);
-        gv << "\tnode_" << i << " [shape=Mrecord; style = filled; fillcolor = palegreen;";
-        gv << "color = \"#000000\"; fontcolor = \"#000000\";  label=\" {";
-        // for (auto it = tempCache.begin(); it != tempCache.end(); ++it) 
-        //     gv << it->value << " | ";
-        gv << "step " << i + 1 << "} \"];\n";
+template <typename KeyType, typename ValueType>
+inline void writeCacheStateToLabel(std::ofstream& gv,
+                                   const LFU<KeyType, ValueType>& cache)
+{
+    bool first = true;
+    for (const auto& cell : cache) {              
+        if (cell.emptyFlag) continue;            
+        if (!first) gv << " | ";
+        gv << cell.value;                        
+        first = false;
     }
-    gv << "\tnode_" << i << " [shape=Mrecord; style = filled; fillcolor = palegreen;";
-    gv << "color = \"#000000\"; fontcolor = \"#000000\";  label=\" { end }\"];\n\n";
+    if (first) gv << "(empty)";
 }
 
-static void dumpConnectNodes(std::ofstream& gv, std::size_t vecSize) {
-    assert(gv && "Unable to write in gv file"); 
+template<typename KeyType, typename ValueType>
+inline void dumpListNodes(std::ofstream& gv,
+                          const std::vector<ValueType>& vec,
+                          std::size_t cacheSize)
+{
+    if (!gv) {
+        throw std::runtime_error("Unable to write in gv file");
+    }
+    LFU<KeyType, ValueType> tempCache(cacheSize);
+
+    for (std::size_t i = 0; i < vec.size(); ++i) {
+        tempCache.cachePut(vec[i]);               
+
+        gv << "\tnode_" << i
+           << " [shape=Mrecord; style=filled; fillcolor=palegreen;"
+              " color=\"#000000\"; fontcolor=\"#000000\"; label=\"{ step "
+           << (i + 1) << " | ";
+        writeCacheStateToLabel<KeyType, ValueType>(gv, tempCache);
+        gv << " }\"];\n";
+    }
+
+    gv << "\tnode_" << vec.size()
+       << " [shape=Mrecord; style=filled; fillcolor=palegreen;"
+          " color=\"#000000\"; fontcolor=\"#000000\"; label=\"{ end | ";
+    writeCacheStateToLabel<KeyType, ValueType>(gv, tempCache);
+    gv << " }\"];\n\n";
+}
+
+void dumpConnectNodes(std::ofstream& gv, std::size_t vecSize) {
+    if (!gv) {
+        throw std::runtime_error("Unable to write in gv file");
+    }
     for (std::size_t i = 0; i < vecSize; ++i) 
         gv << "\tnode_" << i << " -> node_" << i + 1 << '\n';
 }
 
 template<typename KeyType, typename ValueType>
 void graphDump(const std::vector<ValueType>& vec, std::size_t cacheSize) {
-    std::ofstream gv(DUMP_FILE_GV);
-    assert(gv && "Unable to open gv file");
+    const auto paths  = makeDumpPaths();
+    const std::string gvFile  = paths.gv.string();
+    const std::string pngFile = paths.png.string();
+
+    std::ofstream gv(gvFile);
+    if (!gv) {
+        throw std::runtime_error("Unable to opem gv file");
+    }
 
     gv << "digraph G {\n";
     gv << "    rankdir=LR;\n";
@@ -118,12 +165,15 @@ void graphDump(const std::vector<ValueType>& vec, std::size_t cacheSize) {
 
     dumpListNodes<KeyType, ValueType>(gv, vec, cacheSize);
     dumpConnectNodes(gv, vec.size());
-
+    
     gv << "}\n";
     gv.close();
 
-    std::string dotComand = "dot " + DUMP_FILE_GV + " -Tpng -o " + DUMP_FILE_PNG;
-    std::system(dotComand.c_str());
+    std::string dotComand = "dot " + gvFile + " -Tpng -o " + pngFile;
+    const int rc = std::system(dotComand.c_str());
+    if (rc != 0) {
+        throw std::runtime_error("Graphviz 'dot' failed");
+    }
 }
 
 } // namespace cahes

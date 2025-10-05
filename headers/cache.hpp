@@ -27,14 +27,19 @@ struct CacheCell {
 
 template<typename KeyType, typename ValueType> 
 class LFU {
+private:
+    std::size_t                              cacheSize_;
+    Tick_t                                   tick_;
+    std::list<CacheCell<KeyType, ValueType>> data_;
 public:
     const std::size_t KEY_NO_FOUND = 0;
 
     using Cell         = CacheCell<KeyType, ValueType>;
-    using List         = std::list<Cell>;
+    using List         = std::list<CacheCell<KeyType, ValueType>>;
     using ListIt       = typename List::iterator;
     using ListConstIt  = typename List::const_iterator;
     using Metric_t     = std::pair<size_t, Tick_t>;
+    using const_iterator = typename decltype(data_)::const_iterator;
 
     struct MetricComp {
         bool operator()(const Metric_t& lhs, const Metric_t& rhs) const {
@@ -50,7 +55,6 @@ public:
     : cacheSize_   (capacity)
     , tick_        (0)
     , data_        ()           
-    , numberOfHits_(0)
     , hashTable_   ()          
     , cacheFic_    ()           
     , keyToMetric_ () {}
@@ -59,35 +63,36 @@ public:
 
     std::size_t getCacheSize    () const noexcept { return cacheSize_;      }
     std::size_t dataSize        () const noexcept { return data_.size();    }
-    std::size_t getNumberOfHits () const noexcept { return numberOfHits_;   }
 
     ListConstIt begin() const noexcept { return data_.cbegin(); }
-    ListConstIt end  () const noexcept { return data_.cend  (); }
+    ListConstIt end()   const noexcept { return data_.cend(); }
+    const_iterator cbegin() const noexcept { return data_.cbegin(); }
+    const_iterator cend()   const noexcept { return data_.cend(); }
 
-    void cachePut(ValueType value) { 
+    bool cachePut(ValueType value) { 
         KeyType key = getKey(value);
-        if (getCacheSize() == 0) return;
+        if (getCacheSize() == 0) return false;
 
         auto it = findKeyIter(key);
         if (it != end()) {
-            incHit();
+            // ---------- HIT ---------- //
             cacheFicEraseByKey(key);
             ++it->numberOfRequests;
             it->lastAccessedTime  = nextTick();
             cacheFicPut(it->numberOfRequests, it->lastAccessedTime, key);
             splice_to_front(it);
-            return;
+            return true;
         }
 
         if (dataSize() < getCacheSize()) {
             pushNew(key, value, nextTick());
-            return;
+            return false;
         }
 
         auto victim = findReplacedCellIter();
         if (victim == end()) {
             pushNew(key, value, nextTick());
-            return;
+            return false;
         }
 
         cacheFicEraseByKey(victim->key);
@@ -99,41 +104,23 @@ public:
         cacheFicPut(victim->numberOfRequests, victim->lastAccessedTime, key);
 
         splice_to_front(victim);
-    }
 
-    template <typename Fn>
-    void for_each(Fn&& fn) const {
-        for (const auto& cell : data_) {
-            std::forward<Fn>(fn)(cell);
-        }
+        return false;
     }
-
-    template <typename Fn>
-    void for_each(Fn&& fn) {
-        for (auto& cell : data_) {
-            std::forward<Fn>(fn)(cell);
-        }
-    }
-
 private:
-
-    ListIt begin() noexcept { return data_.begin (); }
-    ListIt end  () noexcept { return data_.end   (); }
-
     bool empty() const noexcept { return data_.empty(); }
 
     void push_front(const CacheCell<KeyType, ValueType>& value) { data_.push_front(value); }
 
     std::size_t nextTick() noexcept { return ++tick_;  }
-    void        incHit()   noexcept { ++numberOfHits_; }
 
     typename LFU<KeyType, ValueType>::ListIt
     findReplacedCellIter() {
-        if (getCacheSize() == 0)         return end();
-        if (dataSize() < getCacheSize()) return end();
+        if (getCacheSize() == 0)         return data_.end();
+        if (dataSize() < getCacheSize()) return data_.end();
 
         auto ficIt = getCacheFicBegin();
-        if (ficIt == getCacheFicEnd())   return end();
+        if (ficIt == getCacheFicEnd())   return data_.end();
 
         const KeyType& victimKey = ficIt->second;
         return findKeyIter(victimKey);
@@ -142,8 +129,8 @@ private:
     void eraseIndex(const KeyType& key) { hashTable_.erase(key); }
 
     ListIt pushNew(const KeyType& key, const ValueType& value, Tick_t now) {
-        push_front(Cell{key, value, 1u, now, false});
-        auto it = begin();
+        data_.push_front(CacheCell<KeyType, ValueType>{key, value, 1, now, false});
+        ListIt it = data_.begin();
         putIterByKey(key, it);
         cacheFicPut(it->numberOfRequests, it->lastAccessedTime, key);
         return it;
@@ -179,21 +166,17 @@ private:
     CacheFicIter getCacheFicEnd  () noexcept { return cacheFic_.end();   }
 
     void splice_to_front(ListIt it) {
-        if (it != begin()) data_.splice(begin(), data_, it);
+        if (it != data_.begin()) data_.splice(data_.begin(), data_, it);
     }
 
     void putIterByKey(const KeyType& key, ListIt it) { hashTable_[key] = it; }
 
     ListIt getIterByKey(const KeyType& key) {
         auto it = hashTable_.find(key);
-        return (it == hashTable_.end()) ? end() : it->second;
+        return (it == hashTable_.end()) ? data_.end() : it->second;
     }
 
 private:
-    std::size_t                              cacheSize_;
-    Tick_t                                   tick_;
-    std::list<CacheCell<KeyType, ValueType>> data_;
-    std::size_t                              numberOfHits_;
     std::unordered_map<
         KeyType, 
         ListIt>                              hashTable_;

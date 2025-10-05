@@ -34,14 +34,19 @@ int main(int argc, const char* argv[]) {
         vec.push_back(value);
     }
 
-    for (std::size_t i = 0; i < nItems; ++i)
-        cache.cachePut(vec[i]);
+    std::size_t cacheHits = 0;
+
+    for (std::size_t i = 0; i < nItems; ++i) {
+        if (cache.cachePut(vec[i]))
+            cacheHits++;
+    }
 
     if (interface) {
         consoleDump(cache);
+
         caches::graphDump<std::size_t, int>(vec, cacheSize);
-        std::cout << BLUE << "out: " << YELLOW << cache.getNumberOfHits() << std::endl << RESET; 
+        std::cout << BLUE << "out: " << YELLOW << cacheHits << std::endl << RESET; 
     }
     else
-        std::cout << cache.getNumberOfHits() << std::endl; 
+        std::cout << cacheHits << std::endl; 
 }
