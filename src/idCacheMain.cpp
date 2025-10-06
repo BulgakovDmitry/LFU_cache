@@ -16,7 +16,7 @@ int main() {
     int k = 0;
     for (std::size_t i = 0; i < n; ++i) {
         std::cin >> k;
-        cache.lookupUpdate(k);
+        cache.lookup_update(k);
     }
 
     cache.cacheRun();

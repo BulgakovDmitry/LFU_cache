@@ -23,7 +23,7 @@ public:
         values_.reserve(64);           
     }
 
-    void lookupUpdate(const KeyType& key);
+    void lookup_update(const KeyType& key);
 
     void cacheRun();
 
@@ -40,7 +40,7 @@ private:
 };
 
 template <typename KeyType, typename ValueType>
-void IdealCache<KeyType, ValueType>::lookupUpdate(const KeyType& key) {
+void IdealCache<KeyType, ValueType>::lookup_update(const KeyType& key) {
     values_.push_back(key);
 }
 

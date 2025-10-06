@@ -5,13 +5,14 @@
 #include "../../common/colors.hpp"                
 #include "../../headers/cache.hpp"     
 #include "../../headers/idealCache.hpp" 
+#include "slow_get_page.hpp"
 
 namespace caches {
 
 static TestResult testVerify       (uint64_t testStatus);
 static void       printErrorLog    (uint64_t testStatus);
 static void       printAlgorithmLog(const LFU<std::size_t, int>& cache, Test test);
-static void       printOutputLog   (const LFU<std::size_t, int>& cache, Test test);
+static void       printOutputLog   (const LFU<std::size_t, int>& cache, Test test, std::size_t cacheHits);
 
 namespace CacheLFU {
     static TestResult test         (const Test& test, uint64_t& testStatus);
@@ -53,21 +54,19 @@ static void printAlgorithmLog(const LFU<std::size_t, int>& cache, Test test) {
         std::cout << YELLOW << test.outputVec[k] << ' ' << RESET;
     std::cout << RED << ']' << RESET;
     std::cout << RED << ", and got [ " << RESET;
-    // for (auto it = cache.begin(); it != cache.end(); ++it)
-    //     std::cout << YELLOW << it->value << ' ' << RESET;
-
-    cache.for_each([&](const auto& cell) {
+   
+    for (const auto& cell : cache) {
         std::cout << YELLOW << cell.value << ' ' << RESET;
-    });
+    }
 
     std::cout << RED << "]\n" << RESET;
 }
 
-static void printOutputLog(const LFU<std::size_t, int>& cache, Test test) {
+static void printOutputLog(const LFU<std::size_t, int>& cache, Test test, std::size_t cacheHits) {
     std::cout << RED    << "\t\t\t\texpected number of hits " 
               << YELLOW << test.numberOfHits
               << RED    << " and got " 
-              << YELLOW << cache.getNumberOfHits() << std::endl << RESET;
+              << YELLOW << cacheHits << std::endl << RESET;
 }
 
 static void printLog(const Test& test, std::size_t hits) {
@@ -118,22 +117,29 @@ static TestResult algorithmicTest(const Test& test, uint64_t& testStatus) {
 
     LFU<std::size_t, int> cache(test.cacheSize);
 
-    for (std::size_t i = 0; i < test.nItems; ++i)
-    cache.cachePut(test.inputVec[i]);
-
+    std::size_t cacheHits = 0;
+    for (std::size_t i = 0; i < test.nItems; ++i) {
+        if (cache.lookup_update(test.inputVec[i], slow_get_page))
+            cacheHits++;
+    }
     std::size_t i = 0;
-    cache.for_each([&](const auto& cell) {
+    for (const auto& cell : cache) {
         if (i >= test.outputVec.size()) {
             testStatus |= static_cast<uint64_t>(TestError::ALGORITHM_ERROR);
-            return;
+            break;
         }
-        if (cell.value != test.outputVec[i]) {
+        if (cell.key != test.outputVec[i]) {
             testStatus |= static_cast<uint64_t>(TestError::ALGORITHM_ERROR);
         }
         ++i;
-    });
+    }
+    if (i != test.outputVec.size()) {
+        testStatus |= static_cast<uint64_t>(TestError::ALGORITHM_ERROR);
+    }
 
-    if (cache.getNumberOfHits() != test.numberOfHits)
+
+
+    if (cacheHits != test.numberOfHits)
         testStatus |= static_cast<uint64_t>(TestError::INCORRECT_NUMBER_OF_HITS);
 
     TestResult testResult = testVerify(testStatus);
@@ -141,7 +147,7 @@ static TestResult algorithmicTest(const Test& test, uint64_t& testStatus) {
         if (testStatus & static_cast<uint64_t>(TestError::ALGORITHM_ERROR))
             printAlgorithmLog(cache, test);
         if (testStatus & static_cast<uint64_t>(TestError::INCORRECT_NUMBER_OF_HITS))
-            printOutputLog(cache, test);
+            printOutputLog(cache, test, cacheHits);
     }
 
     testStatus = 0;
@@ -170,7 +176,7 @@ namespace CacheIdeal {
         IdealCache<int, int> icache(test.cacheSize);
 
         for (int k : test.inputVec) 
-            icache.lookupUpdate(k);
+            icache.lookup_update(k);
 
         icache.cacheRun();
 
@@ -191,7 +197,7 @@ namespace CacheLFU {
 
         uint64_t testStatus   = 0;
         uint64_t resultStatus = 0;
-
+        
         for (std::size_t i = 0; i < NUMBER_OF_TESTS; ++i) {
             std::cout << BLUE << "test (" << GREEN << i + 1 << BLUE << ')' << RED << ":\n" << RESET;
             resultStatus += static_cast<uint64_t>(CacheLFU::test(dataBase[i], testStatus));

@@ -7,6 +7,7 @@
 #include "cacheDump.hpp"  
 #include "idealCache.hpp"
 #include <string_view>
+#include "slow_get_page.hpp"
 
 int main(int argc, const char* argv[]) {
     bool interface = (argc > 1) && (std::string_view(argv[1]) == "--interface");
@@ -37,7 +38,7 @@ int main(int argc, const char* argv[]) {
     std::size_t cacheHits = 0;
 
     for (std::size_t i = 0; i < nItems; ++i) {
-        if (cache.cachePut(vec[i]))
+        if (cache.lookup_update(vec[i], slow_get_page))
             cacheHits++;
     }
 

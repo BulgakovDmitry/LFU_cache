@@ -32,13 +32,11 @@ private:
     Tick_t                                   tick_;
     std::list<CacheCell<KeyType, ValueType>> data_;
 public:
-    const std::size_t KEY_NO_FOUND = 0;
-
-    using Cell         = CacheCell<KeyType, ValueType>;
-    using List         = std::list<CacheCell<KeyType, ValueType>>;
-    using ListIt       = typename List::iterator;
-    using ListConstIt  = typename List::const_iterator;
-    using Metric_t     = std::pair<size_t, Tick_t>;
+    using Cell           = CacheCell<KeyType, ValueType>;
+    using List           = std::list<CacheCell<KeyType, ValueType>>;
+    using ListIt         = typename List::iterator;
+    using ListConstIt    = typename List::const_iterator;
+    using Metric_t       = std::pair<size_t, Tick_t>;
     using const_iterator = typename decltype(data_)::const_iterator;
 
     struct MetricComp {
@@ -59,18 +57,14 @@ public:
     , cacheFic_    ()           
     , keyToMetric_ () {}
 
-    ~LFU() = default;
-
-    std::size_t getCacheSize    () const noexcept { return cacheSize_;      }
-    std::size_t dataSize        () const noexcept { return data_.size();    }
+    std::size_t getCacheSize() const noexcept { return cacheSize_;      }
+    std::size_t dataSize    () const noexcept { return data_.size();    }
 
     ListConstIt begin() const noexcept { return data_.cbegin(); }
-    ListConstIt end()   const noexcept { return data_.cend(); }
-    const_iterator cbegin() const noexcept { return data_.cbegin(); }
-    const_iterator cend()   const noexcept { return data_.cend(); }
+    ListConstIt end  () const noexcept { return data_.cend(); }
 
-    bool cachePut(ValueType value) { 
-        KeyType key = getKey(value);
+    template <typename F>
+    bool lookup_update(KeyType key, F slow_get_page) { 
         if (getCacheSize() == 0) return false;
 
         auto it = findKeyIter(key);
@@ -83,6 +77,9 @@ public:
             splice_to_front(it);
             return true;
         }
+
+        // ---------- MISS ---------- //
+        ValueType value = slow_get_page(key);
 
         if (dataSize() < getCacheSize()) {
             pushNew(key, value, nextTick());
@@ -142,7 +139,7 @@ private:
             cacheFic_.erase(km->second);
         
         Metric_t m{numberOfRequests, lastAccessedTime};
-        cacheFic_.insert({m, key});
+        cacheFic_.emplace(m, key);
         keyToMetric_[key] = m;
     }
 
@@ -152,11 +149,6 @@ private:
             cacheFic_.erase(km->second);
             keyToMetric_.erase(km);
         }
-    }
-
-    KeyType getKey(const ValueType& value) {
-        std::size_t hash = std::hash<ValueType>{}(value);
-        return static_cast<KeyType>(hash + std::size_t{1});
     }
 
     typename LFU<KeyType, ValueType>::ListIt 

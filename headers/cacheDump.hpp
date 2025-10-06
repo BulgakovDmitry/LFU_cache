@@ -9,6 +9,7 @@
 #include "cache.hpp"    
 #include <filesystem>             
 #include <fstream>
+#include "slow_get_page.hpp"
 
 namespace caches {
 
@@ -120,7 +121,7 @@ inline void dumpListNodes(std::ofstream& gv,
     LFU<KeyType, ValueType> tempCache(cacheSize);
 
     for (std::size_t i = 0; i < vec.size(); ++i) {
-        tempCache.cachePut(vec[i]);               
+        tempCache.lookup_update(vec[i], slow_get_page);               
 
         gv << "\tnode_" << i
            << " [shape=Mrecord; style=filled; fillcolor=palegreen;"
