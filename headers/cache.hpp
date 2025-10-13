@@ -22,7 +22,8 @@ struct CacheCell {
     std::size_t numberOfRequests{0};
     Tick_t      lastAccessedTime{0};
 
-    bool        emptyFlag{true};
+    explicit CacheCell(KeyType k, ValueType v, std::size_t nReq, Tick_t lastT) 
+    : key{k}, value{v}, numberOfRequests{nReq}, lastAccessedTime{lastT} {} 
 };
 
 template<typename KeyType, typename ValueType> 
@@ -31,6 +32,7 @@ private:
     std::size_t                              cacheSize_;
     Tick_t                                   tick_;
     std::list<CacheCell<KeyType, ValueType>> data_;
+
 public:
     using Cell           = CacheCell<KeyType, ValueType>;
     using List           = std::list<CacheCell<KeyType, ValueType>>;
@@ -39,23 +41,28 @@ public:
     using Metric_t       = std::pair<size_t, Tick_t>;
     using const_iterator = typename decltype(data_)::const_iterator;
 
-    struct MetricComp {
-        bool operator()(const Metric_t& lhs, const Metric_t& rhs) const {
-            if (lhs.first != rhs.first) return lhs.first < rhs.first; 
-            return lhs.second < rhs.second;                           
-        }
-    };
+private:
+struct MetricComp { 
+    bool operator()(const Metric_t& lhs, const Metric_t& rhs) const {
+        if (lhs.first != rhs.first) return lhs.first < rhs.first; 
+        return lhs.second < rhs.second;                           
+    }
+};
+
+public:
+
+    LFU(const LFU&) = delete;
+    LFU(LFU&&) = delete;
+    LFU& operator=(const LFU&) = delete;
+    LFU& operator=(LFU&&) = delete;
+    ~LFU() = default;
 
     using CacheFic     = std::map<Metric_t, KeyType, MetricComp>;
     using CacheFicIter = typename CacheFic::iterator;
 
-    explicit LFU(std::size_t capacity)
+    LFU(std::size_t capacity)
     : cacheSize_   (capacity)
-    , tick_        (0)
-    , data_        ()           
-    , hashTable_   ()          
-    , cacheFic_    ()           
-    , keyToMetric_ () {}
+    , tick_        (0) {}
 
     std::size_t getCacheSize() const noexcept { return cacheSize_;      }
     std::size_t dataSize    () const noexcept { return data_.size();    }
@@ -80,30 +87,10 @@ public:
 
         // ---------- MISS ---------- //
         ValueType value = slow_get_page(key);
-
-        if (dataSize() < getCacheSize()) {
-            pushNew(key, value, nextTick());
-            return false;
-        }
-
-        auto victim = findReplacedCellIter();
-        if (victim == end()) {
-            pushNew(key, value, nextTick());
-            return false;
-        }
-
-        cacheFicEraseByKey(victim->key);
-
-        eraseIndex(victim->key); 
-        *victim = Cell{key, value, 1, nextTick(), false};
-
-        putIterByKey(key, victim);
-        cacheFicPut(victim->numberOfRequests, victim->lastAccessedTime, key);
-
-        splice_to_front(victim);
-
+        put_to_cache(key, value);
         return false;
     }
+    
 private:
     bool empty() const noexcept { return data_.empty(); }
 
@@ -126,7 +113,7 @@ private:
     void eraseIndex(const KeyType& key) { hashTable_.erase(key); }
 
     ListIt pushNew(const KeyType& key, const ValueType& value, Tick_t now) {
-        data_.push_front(CacheCell<KeyType, ValueType>{key, value, 1, now, false});
+        data_.emplace_front(key, value, 1, now);
         ListIt it = data_.begin();
         putIterByKey(key, it);
         cacheFicPut(it->numberOfRequests, it->lastAccessedTime, key);
@@ -158,7 +145,7 @@ private:
     CacheFicIter getCacheFicEnd  () noexcept { return cacheFic_.end();   }
 
     void splice_to_front(ListIt it) {
-        if (it != data_.begin()) data_.splice(data_.begin(), data_, it);
+        data_.splice(data_.begin(), data_, it);
     }
 
     void putIterByKey(const KeyType& key, ListIt it) { hashTable_[key] = it; }
@@ -166,6 +153,29 @@ private:
     ListIt getIterByKey(const KeyType& key) {
         auto it = hashTable_.find(key);
         return (it == hashTable_.end()) ? data_.end() : it->second;
+    }
+
+    void put_to_cache(KeyType key, ValueType value) {
+        if (dataSize() < getCacheSize()) {
+            pushNew(key, value, nextTick());
+            return;
+        }
+
+        auto victim = findReplacedCellIter();
+        if (victim == end()) {
+            pushNew(key, value, nextTick());
+            return;
+        }
+
+        cacheFicEraseByKey(victim->key);
+
+        eraseIndex(victim->key); 
+        *victim = Cell{key, value, 1, nextTick()};
+
+        putIterByKey(key, victim);
+        cacheFicPut(victim->numberOfRequests, victim->lastAccessedTime, key);
+
+        splice_to_front(victim);
     }
 
 private:

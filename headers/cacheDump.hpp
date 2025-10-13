@@ -102,7 +102,6 @@ inline void writeCacheStateToLabel(std::ofstream& gv,
 {
     bool first = true;
     for (const auto& cell : cache) {              
-        if (cell.emptyFlag) continue;            
         if (!first) gv << " | ";
         gv << cell.value;                        
         first = false;

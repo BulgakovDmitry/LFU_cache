@@ -9,7 +9,7 @@ int main() {
     std::size_t n;
 
     if (!(std::cin >> cacheSize >> n)) 
-        throw std::runtime_error("incorrect input");
+        return EXIT_FAILURE;
 
     caches::IdealCache<int, int> cache(cacheSize);
     
